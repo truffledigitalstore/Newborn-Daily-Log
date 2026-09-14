@@ -4,47 +4,61 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Newborn Daily Log</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;0,700;1,500&family=Karla:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#FFF9F5;
-    --surface:#FFFFFF;
-    --surface-2:#FFF3EC;
-    --text:#2E2A2A;
-    --text-muted:#8A817E;
-    --border:#EFE6E1;
-    --shadow: 0 1px 3px rgba(60,40,30,0.08);
-    --radius: 16px;
-    --radius-sm: 10px;
+    --bg:#F6F1E7;
+    --surface:#FFFDF9;
+    --surface-2:#EFE7D8;
+    --text:#2B2620;
+    --text-muted:#8C8275;
+    --border:#E4DAC7;
+    --shadow: 0 1px 3px rgba(60,40,20,0.10);
+    --radius: 18px;
+    --radius-sm: 12px;
 
-    --sleep-bg:#E4EEFB;   --sleep-text:#2E4A6B;   --sleep-accent:#6E9FD8;
-    --feed-bg:#E3F3E6;    --feed-text:#2E5E38;    --feed-accent:#6FBF7B;
-    --diaper-bg:#FBE6EA;  --diaper-text:#7A2E42;  --diaper-accent:#E88FA3;
+    --feed-bg:#E7EFE3;    --feed-text:#3C5A3F;    --feed-accent:#7C9A82;
+    --sleep-bg:#ECE6F6;   --sleep-text:#4A3F6B;   --sleep-accent:#8C7BB5;
+    --diaper-bg:#F7EAD6;  --diaper-text:#7A5A28;  --diaper-accent:#C99A5B;
 
-    --danger:#D2686B;
-    --backdrop: rgba(60,40,30,0.28);
+    --hero-grad: linear-gradient(135deg, #7C9A82, #4F7358);
+    --hero-text: #F7F4EC;
+
+    --danger:#B85C4E;
+    --backdrop: rgba(40,30,15,0.32);
+
+    --font-display: "Lora", Georgia, "Times New Roman", serif;
+    --font-body: "Karla", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --brand-accent: #6E8F72;
   }
 
   :root[data-theme="dark"]{
-    --bg:#171418;
-    --surface:#211D22;
-    --surface-2:#2A252A;
-    --text:#E7E2E4;
-    --text-muted:#A79EA2;
-    --border:#322C31;
-    --shadow: 0 1px 3px rgba(0,0,0,0.4);
+    --bg:#18140F;
+    --surface:#221C16;
+    --surface-2:#2B241C;
+    --text:#EFE7DA;
+    --text-muted:#A99C8B;
+    --border:#382F25;
+    --shadow: 0 1px 3px rgba(0,0,0,0.45);
 
-    --sleep-bg:#223047;   --sleep-text:#B7CBE8;   --sleep-accent:#5A7CA8;
-    --feed-bg:#1F3324;    --feed-text:#B9DABE;    --feed-accent:#5A9464;
-    --diaper-bg:#3A1F28;  --diaper-text:#E3B4C0;  --diaper-accent:#B8657A;
+    --feed-bg:#233024;    --feed-text:#B6D1BB;    --feed-accent:#6E9276;
+    --sleep-bg:#2A2536;   --sleep-text:#C9BEE0;   --sleep-accent:#7C6CA0;
+    --diaper-bg:#3A2C18;  --diaper-text:#E3C793;  --diaper-accent:#B3874D;
 
-    --danger:#C97A7D;
-    --backdrop: rgba(0,0,0,0.55);
+    --hero-grad: linear-gradient(135deg, #3E5A44, #263C2B);
+    --hero-text: #EFE9DC;
+
+    --danger:#C97A6C;
+    --backdrop: rgba(0,0,0,0.6);
+    --brand-accent: #8FAE93;
   }
 
   *{ box-sizing: border-box; }
   html,body{ margin:0; padding:0; }
   body{
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-family: var(--font-body);
     background: var(--bg);
     color: var(--text);
     min-height: 100vh;
@@ -53,13 +67,16 @@
   h1,h2,h3,p{ margin:0; }
   button{ font-family: inherit; cursor:pointer; }
   input, textarea, select{ font-family: inherit; }
+  button:focus-visible, input:focus-visible, textarea:focus-visible, a:focus-visible{
+    outline: 2px solid var(--text);
+    outline-offset: 2px;
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{ transition-duration: 0.001ms !important; animation-duration: 0.001ms !important; }
+  }
 
   /* ---------- Layout shell ---------- */
-  #appShell{
-    display:flex;
-    flex-direction:column;
-    min-height:100vh;
-  }
+  #appShell{ display:flex; flex-direction:column; min-height:100vh; }
 
   #app-header{
     position: sticky; top:0; z-index: 20;
@@ -71,14 +88,12 @@
   }
   .baby-id{
     display:flex; align-items:center; gap:6px;
-    font-weight:700; font-size:15px;
+    font-family: var(--font-display);
+    font-weight:600; font-size:16px;
     white-space:nowrap;
   }
-  #babyNameLabel{ color: var(--text-muted); font-weight:600; }
-  .date-nav{
-    display:flex; align-items:center; gap:4px;
-    margin-left:auto;
-  }
+  #babyNameLabel{ color: var(--text-muted); font-weight:500; }
+  .date-nav{ display:flex; align-items:center; gap:4px; margin-left:auto; }
   .date-nav button, .icon-btn{
     background: var(--surface-2);
     border:1px solid var(--border);
@@ -93,45 +108,31 @@
     border:1px solid var(--border);
     border-radius: var(--radius-sm);
     color: var(--text);
-    padding: 8px 6px;
-    height:36px;
-    font-size:13px;
-    max-width:132px;
+    padding: 8px 6px; height:36px; font-size:13px; max-width:132px;
+    font-family: var(--font-body);
   }
-  #todayBtn{ width:auto; padding:0 12px; font-size:13px; font-weight:600; }
+  #todayBtn{ width:auto; padding:0 12px; font-size:13px; font-weight:700; }
   #themeToggle{ font-size:18px; }
 
-  #summaryBar{
-    display:flex; gap:8px; padding:10px 14px;
-    overflow-x:auto;
-    background: var(--bg);
-  }
-  .chip{
-    flex:0 0 auto;
-    padding:8px 14px;
-    border-radius: 999px;
-    font-size:13px;
-    font-weight:700;
-    white-space:nowrap;
-  }
-  .chip.sleep{ background:var(--sleep-bg); color:var(--sleep-text); }
-  .chip.feed{ background:var(--feed-bg); color:var(--feed-text); }
-  .chip.diaper{ background:var(--diaper-bg); color:var(--diaper-text); }
-
   #bodyRow{ display:flex; flex:1; min-height:0; }
-
   #desktopSidebar{ display:none; }
 
-  main{
-    flex:1;
-    padding: 6px 14px 90px;
-    max-width: 900px;
-    width:100%;
-    margin: 0 auto;
-  }
+  main{ flex:1; padding: 16px 14px 90px; max-width: 720px; width:100%; margin: 0 auto; }
 
-  .view{ display:flex; flex-direction:column; gap:16px; }
+  .view{ display:flex; flex-direction:column; gap:18px; }
   .view[hidden]{ display:none; }
+
+  .page-eyebrow{
+    font-size:11px; font-weight:700; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .page-title{
+    font-family: var(--font-display);
+    font-size: 28px; font-weight:600; line-height:1.15;
+    text-wrap: balance;
+    margin-top:2px;
+  }
+  .page-header{ display:flex; flex-direction:column; gap:2px; }
 
   .card{
     background: var(--surface);
@@ -141,121 +142,154 @@
     padding:16px;
   }
 
-  .section-header{
-    display:flex; align-items:center; justify-content:space-between;
-    margin-bottom:10px;
-  }
+  .section-header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
   .section-title{
     display:flex; align-items:center; gap:8px;
-    font-size:16px; font-weight:800;
+    font-family: var(--font-display);
+    font-size:17px; font-weight:600;
   }
-  .section-title .dot{
-    width:10px;height:10px;border-radius:50%;
-  }
+  .section-title .dot{ width:10px;height:10px;border-radius:50%; }
   .dot.sleep{ background: var(--sleep-accent); }
   .dot.feed{ background: var(--feed-accent); }
   .dot.diaper{ background: var(--diaper-accent); }
 
   .add-btn{
-    border:none; border-radius: 999px;
+    border:1px solid transparent; border-radius: 999px;
     padding:8px 14px;
-    font-size:13px; font-weight:700;
-    color:#fff;
+    font-family: var(--font-body);
+    font-size:12.5px; font-weight:700;
+    display:flex; align-items:center; gap:6px;
   }
-  .add-btn.sleep{ background: var(--sleep-accent); }
-  .add-btn.feed{ background: var(--feed-accent); }
-  .add-btn.diaper{ background: var(--diaper-accent); }
+  .add-btn.sleep{ background: var(--sleep-bg); color: var(--sleep-text); border-color: var(--sleep-accent); }
+  .add-btn.feed{ background: var(--feed-bg); color: var(--feed-text); border-color: var(--feed-accent); }
+  .add-btn.diaper{ background: var(--diaper-bg); color: var(--diaper-text); border-color: var(--diaper-accent); }
+  .add-row{ display:flex; gap:8px; flex-wrap:wrap; }
 
-  .empty-state{
-    text-align:center;
-    color: var(--text-muted);
-    font-size:14px;
-    padding: 22px 8px;
+  .empty-state{ text-align:center; color: var(--text-muted); font-size:14px; padding: 22px 8px; }
+
+  /* ---------- Hero card ---------- */
+  .hero-card{
+    background: var(--hero-grad); color: var(--hero-text);
+    border-radius: var(--radius);
+    padding:20px; display:flex; align-items:center; justify-content:space-between; gap:14px;
+    box-shadow: var(--shadow);
+  }
+  .hero-age{ font-family: var(--font-display); font-size:34px; font-weight:600; line-height:1; }
+  .hero-age-label{ font-size:11px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; opacity:0.85; }
+  .hero-baby-name{ font-family: var(--font-display); font-size:20px; font-weight:600; margin-top:8px; }
+  .hero-born{ font-size:12.5px; opacity:0.8; margin-top:2px; }
+  .hero-empty{ font-size:14px; opacity:0.9; }
+
+  /* ---------- Stat grid ---------- */
+  .stat-grid{ display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
+  .stat-card{ border-radius: var(--radius); padding:14px; display:flex; flex-direction:column; gap:2px; }
+  .stat-card.feed{ background: var(--feed-bg); color: var(--feed-text); }
+  .stat-card.diaper{ background: var(--diaper-bg); color: var(--diaper-text); }
+  .stat-card.sleep{ background: var(--sleep-bg); color: var(--sleep-text); }
+  .stat-card.neutral{ background: var(--surface); border:1px solid var(--border); color: var(--text); }
+  .stat-label{ font-size:10.5px; font-weight:700; letter-spacing:0.07em; text-transform:uppercase; opacity:0.8; }
+  .stat-value{ font-family: var(--font-body); font-size:26px; font-weight:800; font-variant-numeric: tabular-nums; letter-spacing:-0.01em; }
+  .stat-caption{ font-size:12px; opacity:0.85; }
+
+  /* Brand letterhead */
+  #brandBar{
+    text-align:center; padding:8px 0 6px;
+    font-family: var(--font-body);
+    font-size:11px; font-weight:800; letter-spacing:0.18em; text-transform:uppercase;
+    color: var(--brand-accent);
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
   }
 
-  .entry-list{ display:flex; flex-direction:column; gap:8px; }
-  .entry-row{
-    display:flex; align-items:center; gap:10px;
-    padding:10px 12px;
-    border-radius: var(--radius-sm);
-    background: var(--surface-2);
-    border-left: 4px solid transparent;
-  }
-  .entry-row.sleep{ border-left-color: var(--sleep-accent); }
-  .entry-row.feed{ border-left-color: var(--feed-accent); }
-  .entry-row.diaper{ border-left-color: var(--diaper-accent); }
-  .entry-row .entry-main{ flex:1; min-width:0; cursor:pointer; }
-  .entry-row .entry-title{ font-weight:700; font-size:14px; }
-  .entry-row .entry-sub{ font-size:12px; color:var(--text-muted); margin-top:2px; }
-  .entry-row .badge{
-    font-size:11px; font-weight:700; padding:3px 8px; border-radius:999px;
-    background: var(--surface); border:1px solid var(--border); margin-right:4px;
-  }
-  .del-btn{
-    background:none; border:none; color: var(--text-muted);
-    font-size:16px; padding:6px; border-radius:8px;
-  }
-  .del-btn:hover{ color: var(--danger); }
+  /* Line icons */
+  .icon-svg{ width:20px; height:20px; display:block; }
+  .icon-svg.lg{ width:26px; height:26px; }
 
-  /* Quick add grid on Today view */
-  .quick-grid{
-    display:grid; grid-template-columns: repeat(3, 1fr); gap:10px;
-  }
+  /* ---------- Quick log tiles ---------- */
+  .quick-grid{ display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; }
   .quick-tile{
-    border:1px solid var(--border);
-    border-radius: var(--radius-sm);
+    border:1px solid var(--border); border-radius: var(--radius-sm);
     background: var(--surface-2);
     padding:14px 6px;
     display:flex; flex-direction:column; align-items:center; gap:6px;
     font-size:12px; font-weight:700;
   }
-  .quick-tile .emoji{ font-size:22px; }
+  .quick-tile{ color: var(--text); }
+  .quick-tile .icon-svg{ margin-bottom:2px; }
+  .quick-tile[data-quick="feeding"] .icon-svg{ color: var(--feed-accent); }
+  .quick-tile[data-quick="diaper"] .icon-svg{ color: var(--diaper-accent); }
+  .quick-tile[data-quick="sleep"] .icon-svg{ color: var(--sleep-accent); }
 
   .sleeping-now-card{
     background: var(--sleep-bg); color: var(--sleep-text);
-    border-radius: var(--radius);
-    padding:16px;
-    display:flex; align-items:center; justify-content:space-between;
-    gap:10px;
+    border-radius: var(--radius); padding:16px;
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
   }
-  .sleeping-now-card .label{ font-weight:800; font-size:14px; }
-  .sleeping-now-card .elapsed{ font-size:12px; opacity:0.85; }
+  .sleeping-now-card .label{ font-family: var(--font-display); font-weight:600; font-size:15px; display:flex; align-items:center; gap:6px; }
+  .sleeping-now-card .elapsed{ font-size:12px; opacity:0.85; font-variant-numeric: tabular-nums; }
   .wake-btn{
     border:none; border-radius: 999px; padding:10px 16px;
-    background: var(--sleep-accent); color:#fff; font-weight:700; font-size:13px;
-    white-space:nowrap;
+    background: var(--sleep-accent); color:#fff;
+    font-weight:700; font-size:13px; white-space:nowrap;
   }
+
+  /* ---------- Unified activity rows ---------- */
+  .entry-list{ display:flex; flex-direction:column; gap:8px; }
+  .entry-row{
+    display:flex; align-items:center; gap:12px;
+    padding:10px 12px;
+    border-radius: var(--radius-sm);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    cursor:pointer;
+  }
+  .entry-badge{
+    flex:0 0 auto; width:38px; height:38px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size:17px;
+    border: 1px solid rgba(0,0,0,0.06);
+  }
+  .entry-badge.feeding{ background: var(--feed-accent); color: #fff; }
+  .entry-badge.diaper{ background: var(--diaper-accent); color: #fff; }
+  .entry-badge.sleep{ background: var(--sleep-accent); color: #fff; }
+  .entry-main{ flex:1; min-width:0; }
+  .entry-title{ font-weight:700; font-size:14px; }
+  .entry-sub{ font-size:12px; color:var(--text-muted); margin-top:2px; }
+  .entry-time-col{ text-align:right; flex:0 0 auto; }
+  .entry-time{ font-size:13px; font-weight:700; font-variant-numeric: tabular-nums; }
+  .entry-tap{ font-size:10.5px; color: var(--text-muted); margin-top:2px; }
+
+  /* Filter pills */
+  .pill-row{ display:flex; gap:6px; overflow-x:auto; padding-bottom:2px; }
+  .pill{
+    flex:0 0 auto; padding:7px 14px; border-radius:999px;
+    border:1px solid var(--border); background: var(--surface-2); color: var(--text);
+    font-size:12.5px; font-weight:700;
+  }
+  .pill.active{ background: var(--text); color: var(--bg); border-color: transparent; }
 
   /* Mobile bottom nav */
   #mobileTabBar{
     position: fixed; bottom:0; left:0; right:0; z-index: 20;
-    display:flex;
-    background: var(--surface);
-    border-top:1px solid var(--border);
+    display:flex; background: var(--surface); border-top:1px solid var(--border);
     padding-bottom: env(safe-area-inset-bottom, 0);
   }
   #mobileTabBar button{
-    flex:1;
-    display:flex; flex-direction:column; align-items:center; gap:2px;
+    flex:1; display:flex; flex-direction:column; align-items:center; gap:2px;
     background:none; border:none; color: var(--text-muted);
-    padding:8px 2px 10px;
-    font-size:11px; font-weight:600;
-    min-height:52px;
+    padding:8px 2px 10px; font-size:11px; font-weight:700; min-height:52px;
   }
-  #mobileTabBar button .emoji{ font-size:18px; }
-  #mobileTabBar button.active{ color: var(--text); }
+  #mobileTabBar button.active{ color: var(--feed-accent); }
 
   /* Toast */
   #toast{
     position: fixed; left:50%; bottom:80px; transform: translateX(-50%);
     background: var(--text); color: var(--bg);
     padding:10px 16px; border-radius: 999px;
-    font-size:13px; font-weight:600;
+    font-size:13px; font-weight:700;
     opacity:0; pointer-events:none;
     transition: opacity 0.25s ease, transform 0.25s ease;
-    z-index: 50;
-    max-width: 86vw;
-    text-align:center;
+    z-index: 50; max-width: 86vw; text-align:center;
   }
   #toast.show{ opacity:1; transform: translateX(-50%) translateY(-4px); }
 
@@ -263,18 +297,17 @@
   dialog#entryModal{
     border:none; border-radius: var(--radius);
     padding:0; width: min(440px, 92vw);
-    background: var(--surface);
-    color: var(--text);
+    background: var(--surface); color: var(--text);
   }
   dialog#entryModal::backdrop{ background: var(--backdrop); }
-  .modal-inner{ padding:18px; display:flex; flex-direction:column; gap:14px; }
-  .modal-title{ font-size:17px; font-weight:800; }
+  .modal-inner{ padding:20px; display:flex; flex-direction:column; gap:14px; }
+  .modal-title{ font-family: var(--font-display); font-size:20px; font-weight:600; }
   .field-row{ display:flex; flex-direction:column; gap:6px; }
-  .field-row label{ font-size:12px; font-weight:700; color: var(--text-muted); }
+  .field-row label{ font-size:11px; font-weight:700; letter-spacing:0.03em; text-transform:uppercase; color: var(--text-muted); }
   .field-row input[type="time"], .field-row input[type="number"], .field-row input[type="text"], .field-row textarea{
     border:1px solid var(--border); border-radius: var(--radius-sm);
     background: var(--surface-2); color: var(--text);
-    padding:10px; font-size:14px;
+    padding:10px; font-size:14px; font-family: var(--font-body);
   }
   .field-row textarea{ resize: vertical; min-height:44px; }
   .seg{ display:flex; gap:6px; }
@@ -296,21 +329,17 @@
   .row-inline{ display:flex; gap:10px; }
   .row-inline > .field-row{ flex:1; }
   .modal-actions{ display:flex; gap:10px; margin-top:4px; }
-  .btn{
-    flex:1; padding:12px; border-radius: var(--radius-sm); border:none;
-    font-weight:800; font-size:14px;
-  }
+  .btn{ flex:1; padding:12px; border-radius: var(--radius-sm); border:none; font-weight:700; font-size:14px; }
   .btn.primary{ background: var(--text); color: var(--bg); }
   .btn.ghost{ background: var(--surface-2); color: var(--text); border:1px solid var(--border); }
   .btn.danger{ background: var(--danger); color:#fff; }
 
   /* Settings view */
-  .settings-list .card + .card{ margin-top:0; }
   .settings-row{ display:flex; flex-direction:column; gap:8px; }
   .settings-row input[type="text"], .settings-row input[type="date"]{
     border:1px solid var(--border); border-radius: var(--radius-sm);
     background: var(--surface-2); color: var(--text);
-    padding:10px; font-size:14px;
+    padding:10px; font-size:14px; font-family: var(--font-body);
   }
   .file-btn-label{
     display:block; text-align:center;
@@ -320,9 +349,9 @@
   }
   .warning-banner{
     background: var(--diaper-bg); color: var(--diaper-text);
-    border-radius: var(--radius-sm); padding:12px; font-size:12.5px; line-height:1.4;
+    border-radius: var(--radius-sm); padding:12px; font-size:12.5px; line-height:1.5;
   }
-  .muted-small{ font-size:12px; color: var(--text-muted); }
+  .muted-small{ font-size:11px; color: var(--text-muted); font-weight:700; letter-spacing: 0.05em; text-transform: uppercase; }
 
   /* Desktop layout */
   @media (min-width: 768px){
@@ -338,16 +367,16 @@
       padding:10px 12px; border-radius: var(--radius-sm);
       font-size:14px; font-weight:700; text-align:left;
     }
-    #desktopSidebar button.active{ background: var(--surface-2); }
+    #desktopSidebar button.active{ background: var(--feed-bg); color: var(--feed-text); }
     #mobileTabBar{ display:none; }
-    main{ padding: 20px 24px 40px; }
-    .quick-grid{ grid-template-columns: repeat(4, 1fr); }
+    main{ padding: 26px 30px 40px; }
+    .stat-grid{ grid-template-columns: repeat(4, 1fr); }
+    .hero-card{ padding:26px; }
   }
 </style>
 </head>
 <body>
 <script>
-  // Apply theme before first paint to avoid flash of wrong theme.
   (function(){
     try{
       var raw = localStorage.getItem('newbornDailyLog.v1');
@@ -361,13 +390,14 @@
         resolved = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
       }
       document.documentElement.setAttribute('data-theme', resolved);
-    }catch(e){ /* ignore, default light */ }
+    }catch(e){}
   })();
 </script>
 
 <div id="appShell">
+  <div id="brandBar">Newborn Daily Log</div>
   <header id="app-header">
-    <div class="baby-id">🍼 <span id="babyNameLabel">Baby</span></div>
+    <div class="baby-id"><span id="babyNameLabel">Baby</span></div>
     <div class="date-nav">
       <button id="prevDay" aria-label="Previous day">‹</button>
       <input type="date" id="datePicker">
@@ -377,31 +407,30 @@
     </div>
   </header>
 
-  <section id="summaryBar">
-    <div class="chip sleep" id="chipSleep">0h sleep</div>
-    <div class="chip feed" id="chipFeed">0 feeds</div>
-    <div class="chip diaper" id="chipDiaper">0 wet · 0 dirty</div>
-  </section>
-
   <div id="bodyRow">
     <nav id="desktopSidebar">
-      <button data-view="today" class="active">🏠 Today</button>
-      <button data-view="sleep">😴 Sleep</button>
-      <button data-view="feeding">🍼 Feeding</button>
-      <button data-view="diaper">🧷 Diapers</button>
-      <button data-view="settings">⚙️ Settings</button>
+      <button data-view="today" class="active"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11.5L12 4l8 7.5"/><path d="M6 10v9h5v-5h2v5h5v-9"/></svg> Today</button>
+      <button data-view="log"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4.5 6h.01M4.5 12h.01M4.5 18h.01"/></svg> Care Log</button>
+      <button data-view="settings"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.34 1.87l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.7 1.7 0 00-1.87-.34 1.7 1.7 0 00-1 1.55V21a2 2 0 11-4 0v-.09a1.7 1.7 0 00-1-1.56 1.7 1.7 0 00-1.87.34l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.7 1.7 0 00.34-1.87 1.7 1.7 0 00-1.55-1H3a2 2 0 110-4h.09a1.7 1.7 0 001.56-1 1.7 1.7 0 00-.34-1.87l-.06-.06a2 2 0 112.83-2.83l.06.06a1.7 1.7 0 001.87.34h0a1.7 1.7 0 001-1.55V3a2 2 0 114 0v.09a1.7 1.7 0 001 1.56 1.7 1.7 0 001.87-.34l.06-.06a2 2 0 112.83 2.83l-.06.06a1.7 1.7 0 00-.34 1.87v0a1.7 1.7 0 001.55 1H21a2 2 0 110 4h-.09a1.7 1.7 0 00-1.56 1z"/></svg> Settings</button>
     </nav>
 
     <main>
       <section class="view" id="view-today">
+        <div class="page-header">
+          <div class="page-eyebrow" id="todayEyebrow">TODAY</div>
+          <h1 class="page-title" id="todayGreeting">Good day</h1>
+        </div>
+
+        <div class="hero-card" id="heroCard"></div>
+
+        <div class="stat-grid" id="statGrid"></div>
+
         <div class="card">
-          <div class="section-header">
-            <div class="section-title">Quick log</div>
-          </div>
+          <div class="section-header"><div class="section-title">Quick log</div></div>
           <div class="quick-grid">
-            <button class="quick-tile" data-quick="sleep"><span class="emoji">😴</span>Sleep</button>
-            <button class="quick-tile" data-quick="feeding"><span class="emoji">🤱</span>Feeding</button>
-            <button class="quick-tile" data-quick="diaper"><span class="emoji">🧷</span>Diaper</button>
+            <button class="quick-tile" data-quick="feeding"><svg class="icon-svg lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3C12 3 6 10.5 6 15a6 6 0 0012 0c0-4.5-6-12-6-12z"/></svg>Feed</button>
+            <button class="quick-tile" data-quick="diaper"><svg class="icon-svg lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h16"/><path d="M4 9c0 6 3 10 8 10s8-4 8-10"/><path d="M4 9c-1.6 0-2.2 1.6-1 3.2"/><path d="M20 9c1.6 0 2.2 1.6 1 3.2"/></svg>Diaper</button>
+            <button class="quick-tile" data-quick="sleep"><svg class="icon-svg lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8.5 8.5 0 119.5 4a7 7 0 1010.5 10.5z"/></svg>Sleep</button>
           </div>
         </div>
 
@@ -409,58 +438,41 @@
 
         <div class="card">
           <div class="section-header">
-            <div class="section-title"><span class="dot sleep"></span>Sleep</div>
+            <div class="section-title">Recent activity</div>
+            <button class="add-btn feed" id="seeAllBtn" style="border-color:var(--border); background:var(--surface-2); color:var(--text);">See all</button>
           </div>
-          <div class="entry-list" id="todaySleepList"></div>
-        </div>
-
-        <div class="card">
-          <div class="section-header">
-            <div class="section-title"><span class="dot feed"></span>Feeding</div>
-          </div>
-          <div class="entry-list" id="todayFeedList"></div>
-        </div>
-
-        <div class="card">
-          <div class="section-header">
-            <div class="section-title"><span class="dot diaper"></span>Diapers</div>
-          </div>
-          <div class="entry-list" id="todayDiaperList"></div>
+          <div class="entry-list" id="recentList"></div>
         </div>
       </section>
 
-      <section class="view" id="view-sleep" hidden>
-        <div id="sleepingNowSlot2"></div>
-        <div class="card">
-          <div class="section-header">
-            <div class="section-title"><span class="dot sleep"></span>Sleep</div>
-            <button class="add-btn sleep" data-add="sleep">+ Add Sleep</button>
-          </div>
-          <div class="entry-list" id="sleepList"></div>
+      <section class="view" id="view-log" hidden>
+        <div class="page-header">
+          <div class="page-eyebrow">BABY CARE LOG</div>
+          <h1 class="page-title">All Entries</h1>
         </div>
-      </section>
 
-      <section class="view" id="view-feeding" hidden>
-        <div class="card">
-          <div class="section-header">
-            <div class="section-title"><span class="dot feed"></span>Feeding</div>
-            <button class="add-btn feed" data-add="feeding">+ Add Feeding</button>
-          </div>
-          <div class="entry-list" id="feedList"></div>
+        <div class="add-row">
+          <button class="add-btn feed" data-add="feeding"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3C12 3 6 10.5 6 15a6 6 0 0012 0c0-4.5-6-12-6-12z"/></svg> Feed</button>
+          <button class="add-btn diaper" data-add="diaper"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h16"/><path d="M4 9c0 6 3 10 8 10s8-4 8-10"/><path d="M4 9c-1.6 0-2.2 1.6-1 3.2"/><path d="M20 9c1.6 0 2.2 1.6 1 3.2"/></svg> Diaper</button>
+          <button class="add-btn sleep" data-add="sleep"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8.5 8.5 0 119.5 4a7 7 0 1010.5 10.5z"/></svg> Sleep</button>
         </div>
-      </section>
 
-      <section class="view" id="view-diaper" hidden>
-        <div class="card">
-          <div class="section-header">
-            <div class="section-title"><span class="dot diaper"></span>Diapers</div>
-            <button class="add-btn diaper" data-add="diaper">+ Add Diaper</button>
-          </div>
-          <div class="entry-list" id="diaperList"></div>
+        <div class="pill-row" id="filterPills">
+          <button class="pill active" data-filter="all">All</button>
+          <button class="pill" data-filter="feeding">Feeds</button>
+          <button class="pill" data-filter="diaper">Diapers</button>
+          <button class="pill" data-filter="sleep">Sleep</button>
         </div>
+
+        <div class="entry-list" id="fullLogList"></div>
       </section>
 
       <section class="view" id="view-settings" hidden>
+        <div class="page-header">
+          <div class="page-eyebrow">SETUP</div>
+          <h1 class="page-title">Settings</h1>
+        </div>
+
         <div class="card settings-row">
           <div class="section-title">Baby profile</div>
           <label class="muted-small">Baby's name</label>
@@ -494,11 +506,9 @@
   </div>
 
   <nav id="mobileTabBar">
-    <button data-view="today" class="active"><span class="emoji">🏠</span>Today</button>
-    <button data-view="sleep"><span class="emoji">😴</span>Sleep</button>
-    <button data-view="feeding"><span class="emoji">🤱</span>Feed</button>
-    <button data-view="diaper"><span class="emoji">🧷</span>Diaper</button>
-    <button data-view="settings"><span class="emoji">⚙️</span>More</button>
+    <button data-view="today" class="active"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11.5L12 4l8 7.5"/><path d="M6 10v9h5v-5h2v5h5v-9"/></svg>Today</button>
+    <button data-view="log"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4.5 6h.01M4.5 12h.01M4.5 18h.01"/></svg>Care Log</button>
+    <button data-view="settings"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.34 1.87l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.7 1.7 0 00-1.87-.34 1.7 1.7 0 00-1 1.55V21a2 2 0 11-4 0v-.09a1.7 1.7 0 00-1-1.56 1.7 1.7 0 00-1.87.34l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.7 1.7 0 00.34-1.87 1.7 1.7 0 00-1.55-1H3a2 2 0 110-4h.09a1.7 1.7 0 001.56-1 1.7 1.7 0 00-.34-1.87l-.06-.06a2 2 0 112.83-2.83l.06.06a1.7 1.7 0 001.87.34h0a1.7 1.7 0 001-1.55V3a2 2 0 114 0v.09a1.7 1.7 0 001 1.56 1.7 1.7 0 001.87-.34l.06-.06a2 2 0 112.83 2.83l-.06.06a1.7 1.7 0 00-.34 1.87v0a1.7 1.7 0 001.55 1H21a2 2 0 110 4h-.09a1.7 1.7 0 00-1.56 1z"/></svg>Settings</button>
   </nav>
 </div>
 
@@ -541,8 +551,7 @@
     try{ raw = localStorage.getItem(STORAGE_KEY); }catch(e){}
     if(!raw) return defaultState();
     try{
-      var parsed = JSON.parse(raw);
-      return migrate(parsed);
+      return migrate(JSON.parse(raw));
     }catch(e){
       try{ localStorage.setItem(STORAGE_KEY + '.corrupt.' + Date.now(), raw); }catch(e2){}
       return defaultState();
@@ -587,10 +596,7 @@
     var d = new Date();
     return pad(d.getHours()) + ':' + pad(d.getMinutes());
   }
-  function combineDateTime(dateStr, timeStr){
-    // returns ISO-ish local datetime string (no timezone conversion, kept local)
-    return dateStr + 'T' + timeStr + ':00';
-  }
+  function combineDateTime(dateStr, timeStr){ return dateStr + 'T' + timeStr + ':00'; }
   function formatTime12(timeStr){
     if(!timeStr) return '';
     var parts = timeStr.split(':');
@@ -600,12 +606,7 @@
     var h12 = h % 12; if(h12 === 0) h12 = 12;
     return h12 + ':' + m + ' ' + ampm;
   }
-  function extractTime(iso){
-    // iso like YYYY-MM-DDTHH:MM:SS -> HH:MM
-    var t = iso.split('T')[1] || '00:00:00';
-    return t.slice(0,5);
-  }
-  function extractDate(iso){ return iso.split('T')[0]; }
+  function extractTime(iso){ var t = iso.split('T')[1] || '00:00:00'; return t.slice(0,5); }
   function minutesBetween(isoA, isoB){
     var a = new Date(isoA.replace(' ', 'T'));
     var b = new Date(isoB.replace(' ', 'T'));
@@ -619,14 +620,48 @@
     if(h <= 0) return m + 'm';
     return h + 'h ' + m + 'm';
   }
+  function formatDateLong(dateStr){
+    var d = parseDateStr(dateStr);
+    var days = ['SUNDAY','MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY'];
+    var months = ['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'];
+    return days[d.getDay()] + ', ' + months[d.getMonth()] + ' ' + d.getDate();
+  }
+  function formatDateShort(dateStr){
+    if(!dateStr) return '';
+    var d = parseDateStr(dateStr);
+    var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return months[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear();
+  }
+  function greetingWord(){
+    var h = new Date().getHours();
+    if(h < 12) return 'morning';
+    if(h < 18) return 'afternoon';
+    return 'evening';
+  }
+  function computeAgeLabel(birthDateStr){
+    if(!birthDateStr) return null;
+    var birth = parseDateStr(birthDateStr);
+    var today = new Date();
+    if(birth > today) return null;
+    var days = Math.floor((today - birth) / 86400000);
+    if(days < 14) return { big: String(days), unit: days === 1 ? 'day old' : 'days old' };
+    if(days < 60) { var w = Math.floor(days / 7); return { big: String(w), unit: w === 1 ? 'week old' : 'weeks old' }; }
+    var months = (today.getFullYear() - birth.getFullYear()) * 12 + (today.getMonth() - birth.getMonth());
+    if(today.getDate() < birth.getDate()) months -= 1;
+    if(months < 24) return { big: String(Math.max(months,1)), unit: months === 1 ? 'month old' : 'months old' };
+    var years = Math.floor(months / 12);
+    return { big: String(years), unit: years === 1 ? 'year old' : 'years old' };
+  }
+  function sleepLabel(startIso){
+    var h = new Date(startIso.replace(' ', 'T')).getHours();
+    return (h >= 18 || h < 6) ? 'Night' : 'Nap';
+  }
 
   // ---------------- View switching ----------------
   var currentView = 'today';
   function switchView(name){
     currentView = name;
-    document.querySelectorAll('.view').forEach(function(v){
-      v.hidden = (v.id !== 'view-' + name);
-    });
+    document.querySelectorAll('.view').forEach(function(v){ v.hidden = (v.id !== 'view-' + name); });
     document.querySelectorAll('#desktopSidebar button, #mobileTabBar button').forEach(function(btn){
       btn.classList.toggle('active', btn.getAttribute('data-view') === name);
     });
@@ -634,6 +669,18 @@
   }
   document.querySelectorAll('#desktopSidebar button, #mobileTabBar button').forEach(function(btn){
     btn.addEventListener('click', function(){ switchView(btn.getAttribute('data-view')); });
+  });
+  document.getElementById('seeAllBtn').addEventListener('click', function(){ switchView('log'); });
+
+  // ---------------- Filter pills (Care Log) ----------------
+  var activeFilter = 'all';
+  document.querySelectorAll('#filterPills .pill').forEach(function(p){
+    p.addEventListener('click', function(){
+      activeFilter = p.getAttribute('data-filter');
+      document.querySelectorAll('#filterPills .pill').forEach(function(x){ x.classList.remove('active'); });
+      p.classList.add('active');
+      renderAll();
+    });
   });
 
   // ---------------- Date nav ----------------
@@ -644,19 +691,13 @@
     if(datePicker.value){ selectedDate = datePicker.value; renderAll(); }
   });
   document.getElementById('prevDay').addEventListener('click', function(){
-    selectedDate = addDays(selectedDate, -1);
-    datePicker.value = selectedDate;
-    renderAll();
+    selectedDate = addDays(selectedDate, -1); datePicker.value = selectedDate; renderAll();
   });
   document.getElementById('nextDay').addEventListener('click', function(){
-    selectedDate = addDays(selectedDate, 1);
-    datePicker.value = selectedDate;
-    renderAll();
+    selectedDate = addDays(selectedDate, 1); datePicker.value = selectedDate; renderAll();
   });
   document.getElementById('todayBtn').addEventListener('click', function(){
-    selectedDate = todayStr();
-    datePicker.value = selectedDate;
-    renderAll();
+    selectedDate = todayStr(); datePicker.value = selectedDate; renderAll();
   });
 
   // ---------------- Theme ----------------
@@ -677,14 +718,12 @@
   document.getElementById('themeToggle').addEventListener('click', function(){
     var resolved = resolveTheme();
     state.settings.theme = resolved === 'dark' ? 'light' : 'dark';
-    applyTheme();
-    flushSave();
+    applyTheme(); flushSave();
   });
   document.querySelectorAll('#themeSeg button').forEach(function(b){
     b.addEventListener('click', function(){
       state.settings.theme = b.getAttribute('data-theme-choice');
-      applyTheme();
-      flushSave();
+      applyTheme(); flushSave();
     });
   });
 
@@ -702,10 +741,7 @@
   var modal = document.getElementById('entryModal');
   var modalInner = document.getElementById('modalInner');
 
-  function closeModal(){
-    if(modal.open) modal.close();
-    modalInner.innerHTML = '';
-  }
+  function closeModal(){ if(modal.open) modal.close(); modalInner.innerHTML = ''; }
 
   function openEntryModal(type, entry){
     var isEdit = !!entry;
@@ -770,7 +806,6 @@
 
     modalInner.innerHTML = html;
 
-    // Wire method segmented control (feeding)
     if(type === 'feeding'){
       var methodSeg = document.getElementById('f_method');
       methodSeg.querySelectorAll('button').forEach(function(btn){
@@ -800,12 +835,10 @@
     if(isEdit){
       document.getElementById('modalDeleteBtn').addEventListener('click', function(){
         deleteEntry(type, entry.id);
-        closeModal();
-        renderAll();
+        closeModal(); renderAll();
         showToast('Deleted');
       });
     }
-
     document.getElementById('modalSaveBtn').addEventListener('click', function(){
       saveEntryFromModal(type, isEdit ? entry : null, d);
     });
@@ -829,15 +862,10 @@
       var endIso = null;
       if(endTime){
         endIso = combineDateTime(dateStr, endTime);
-        if(endTime < startTime){
-          endIso = combineDateTime(addDays(dateStr, 1), endTime);
-        }
+        if(endTime < startTime){ endIso = combineDateTime(addDays(dateStr, 1), endTime); }
       }
-      if(existing){
-        existing.start = startIso; existing.end = endIso; existing.notes = notes;
-      } else {
-        state.sleepEntries.push({ id: uuid(), babyId: state.baby.id, date: dateStr, start: startIso, end: endIso, notes: notes });
-      }
+      if(existing){ existing.start = startIso; existing.end = endIso; existing.notes = notes; }
+      else{ state.sleepEntries.push({ id: uuid(), babyId: state.baby.id, date: dateStr, start: startIso, end: endIso, notes: notes }); }
     } else if(type === 'feeding'){
       var methodBtn = document.querySelector('#f_method button.active');
       var method = methodBtn ? methodBtn.getAttribute('data-val') : 'breast';
@@ -869,15 +897,10 @@
       var wet = document.getElementById('f_wet').classList.contains('on');
       var dirty = document.getElementById('f_dirty').classList.contains('on');
       var notes3 = document.getElementById('f_notes').value;
-      if(existing){
-        existing.time = timeIso2; existing.wet = wet; existing.dirty = dirty; existing.notes = notes3;
-      } else {
-        state.diaperEntries.push({ id: uuid(), babyId: state.baby.id, date: dateStr, time: timeIso2, wet: wet, dirty: dirty, notes: notes3 });
-      }
+      if(existing){ existing.time = timeIso2; existing.wet = wet; existing.dirty = dirty; existing.notes = notes3; }
+      else{ state.diaperEntries.push({ id: uuid(), babyId: state.baby.id, date: dateStr, time: timeIso2, wet: wet, dirty: dirty, notes: notes3 }); }
     }
-    flushSave();
-    closeModal();
-    renderAll();
+    flushSave(); closeModal(); renderAll();
     showToast(existing ? 'Saved' : 'Added');
   }
 
@@ -900,22 +923,96 @@
     btn.addEventListener('click', function(){ openEntryModal(btn.getAttribute('data-add'), null); });
   });
 
-  // ---------------- Rendering ----------------
+  // ---------------- Unified entry helpers ----------------
+  function unifiedEntriesForDate(dateStr){
+    var list = [];
+    getEntriesForDate('feeding', dateStr).forEach(function(e){ list.push({ type:'feeding', sortKey: e.time, entry: e }); });
+    getEntriesForDate('diaper', dateStr).forEach(function(e){ list.push({ type:'diaper', sortKey: e.time, entry: e }); });
+    getEntriesForDate('sleep', dateStr).forEach(function(e){ list.push({ type:'sleep', sortKey: e.start, entry: e }); });
+    list.sort(function(a,b){ return a.sortKey < b.sortKey ? 1 : (a.sortKey > b.sortKey ? -1 : 0); }); // descending
+    return list;
+  }
+
+  var ICON_FEED = '<svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3C12 3 6 10.5 6 15a6 6 0 0012 0c0-4.5-6-12-6-12z"/></svg>';
+  var ICON_DIAPER = '<svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h16"/><path d="M4 9c0 6 3 10 8 10s8-4 8-10"/><path d="M4 9c-1.6 0-2.2 1.6-1 3.2"/><path d="M20 9c1.6 0 2.2 1.6 1 3.2"/></svg>';
+  var ICON_SLEEP = '<svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8.5 8.5 0 119.5 4a7 7 0 1010.5 10.5z"/></svg>';
+
+  function entryTitleAndSub(type, entry){
+    if(type === 'feeding'){
+      var title = '';
+      if(entry.method === 'breast'){
+        var sideLabel = entry.side === 'L' ? 'Left' : (entry.side === 'R' ? 'Right' : 'Both');
+        title = 'Breast · ' + sideLabel + (entry.durationMin ? ' · ' + entry.durationMin + ' min' : '');
+      } else if(entry.method === 'bottle'){
+        title = 'Bottle' + (entry.bottleOz ? ' · ' + entry.bottleOz + ' oz' : '');
+      } else {
+        title = 'Solid food';
+      }
+      return { icon: ICON_FEED, title: title, sub: entry.notes || '' };
+    }
+    if(type === 'diaper'){
+      var title2 = (entry.wet && entry.dirty) ? 'Both diaper' : (entry.wet ? 'Wet diaper' : (entry.dirty ? 'Dirty diaper' : 'Diaper change'));
+      return { icon: ICON_DIAPER, title: title2, sub: entry.notes || '' };
+    }
+    // sleep
+    var label = sleepLabel(entry.start);
+    var dur = entry.end ? formatDurationMin(minutesBetween(entry.start, entry.end)) : 'Still sleeping';
+    return { icon: ICON_SLEEP, title: label + ' · ' + dur, sub: entry.notes || '' };
+  }
+
+  function entryTimeLabel(type, entry){
+    if(type === 'sleep'){
+      var startT = formatTime12(extractTime(entry.start));
+      var endT = entry.end ? formatTime12(extractTime(entry.end)) : '';
+      return endT ? (startT + ' – ' + endT) : startT;
+    }
+    var t = type === 'feeding' ? entry.time : entry.time;
+    return formatTime12(extractTime(t));
+  }
+
+  function renderUnifiedRow(item){
+    var row = document.createElement('div');
+    row.className = 'entry-row';
+    var info = entryTitleAndSub(item.type, item.entry);
+    var badge = document.createElement('div');
+    badge.className = 'entry-badge ' + item.type;
+    badge.innerHTML = info.icon;
+    var main = document.createElement('div');
+    main.className = 'entry-main';
+    main.innerHTML = '<div class="entry-title">' + escapeHtml(info.title) + '</div>' +
+      (info.sub ? '<div class="entry-sub">' + escapeHtml(info.sub) + '</div>' : '');
+    var timeCol = document.createElement('div');
+    timeCol.className = 'entry-time-col';
+    timeCol.innerHTML = '<div class="entry-time">' + entryTimeLabel(item.type, item.entry) + '</div><div class="entry-tap">tap to edit</div>';
+    row.appendChild(badge); row.appendChild(main); row.appendChild(timeCol);
+    row.addEventListener('click', function(){ openEntryModal(item.type, item.entry); });
+    return row;
+  }
+
+  function renderRowList(containerId, items, emptyMsg){
+    var container = document.getElementById(containerId);
+    container.innerHTML = '';
+    if(!items.length){
+      var empty = document.createElement('div');
+      empty.className = 'empty-state';
+      empty.textContent = emptyMsg;
+      container.appendChild(empty);
+      return;
+    }
+    items.forEach(function(item){ container.appendChild(renderUnifiedRow(item)); });
+  }
+
+  // ---------------- Sleeping-now card ----------------
   function renderSleepingNowCard(){
     var ongoing = state.sleepEntries.filter(function(e){ return e.end === null && e.date === todayStr(); });
-    var html = '';
-    if(ongoing.length){
-      var e = ongoing[ongoing.length - 1];
-      var startTimeDisplay = formatTime12(extractTime(e.start));
-      html = '<div class="sleeping-now-card">' +
-        '<div><div class="label">😴 Sleeping now</div><div class="elapsed" data-start-iso="' + e.start + '">Started at ' + startTimeDisplay + '</div></div>' +
-        '<button class="wake-btn" data-wake-id="' + e.id + '">Wake Up</button>' +
-      '</div>';
-    }
-    var slot1 = document.getElementById('sleepingNowSlot');
-    var slot2 = document.getElementById('sleepingNowSlot2');
-    slot1.innerHTML = html;
-    slot2.innerHTML = (currentView === 'sleep') ? html : '';
+    var slot = document.getElementById('sleepingNowSlot');
+    if(!ongoing.length){ slot.innerHTML = ''; return; }
+    var e = ongoing[ongoing.length - 1];
+    var startTimeDisplay = formatTime12(extractTime(e.start));
+    slot.innerHTML = '<div class="sleeping-now-card">' +
+      '<div><div class="label">' + ICON_SLEEP + ' Sleeping now</div><div class="elapsed" data-start-iso="' + e.start + '">Started at ' + startTimeDisplay + '</div></div>' +
+      '<button class="wake-btn" data-wake-id="' + e.id + '">Wake Up</button>' +
+    '</div>';
     document.querySelectorAll('[data-wake-id]').forEach(function(btn){
       btn.addEventListener('click', function(){
         var id = btn.getAttribute('data-wake-id');
@@ -923,102 +1020,52 @@
         if(entry){
           var now = new Date();
           entry.end = toDateStr(now) + 'T' + pad(now.getHours()) + ':' + pad(now.getMinutes()) + ':00';
-          flushSave();
-          renderAll();
+          flushSave(); renderAll();
           showToast('Woke up logged');
         }
       });
     });
   }
 
-  function renderEntryRow(type, entry){
-    var row = document.createElement('div');
-    row.className = 'entry-row ' + type;
-    var main = document.createElement('div');
-    main.className = 'entry-main';
-
-    if(type === 'sleep'){
-      var startT = formatTime12(extractTime(entry.start));
-      var endT = entry.end ? formatTime12(extractTime(entry.end)) : 'Still sleeping';
-      var dur = entry.end ? formatDurationMin(minutesBetween(entry.start, entry.end)) : '';
-      main.innerHTML = '<div class="entry-title">' + startT + ' – ' + endT + '</div>' +
-        '<div class="entry-sub">' + (dur ? dur : '') + (entry.notes ? (dur ? ' · ' : '') + escapeHtml(entry.notes) : '') + '</div>';
-    } else if(type === 'feeding'){
-      var t = formatTime12(extractTime(entry.time));
-      var icon = entry.method === 'breast' ? '🤱' : (entry.method === 'bottle' ? '🍼' : '🥣');
-      var sub = '';
-      if(entry.method === 'breast'){
-        var sideLabel = entry.side === 'L' ? 'Left' : (entry.side === 'R' ? 'Right' : 'Both');
-        sub = 'Breast, ' + sideLabel + (entry.durationMin ? ', ' + entry.durationMin + ' min' : '');
-      } else if(entry.method === 'bottle'){
-        sub = 'Bottle' + (entry.bottleOz ? ', ' + entry.bottleOz + ' oz' : '');
-      } else {
-        sub = 'Solid' + (entry.notes ? '' : '');
-      }
-      main.innerHTML = '<div class="entry-title">' + icon + ' ' + t + '</div>' +
-        '<div class="entry-sub">' + sub + (entry.notes && entry.method !== 'solid' ? ' · ' + escapeHtml(entry.notes) : (entry.notes ? escapeHtml(entry.notes) : '')) + '</div>';
-    } else if(type === 'diaper'){
-      var t2 = formatTime12(extractTime(entry.time));
-      var badges = '';
-      if(entry.wet) badges += '<span class="badge">💧 Wet</span>';
-      if(entry.dirty) badges += '<span class="badge">💩 Dirty</span>';
-      main.innerHTML = '<div class="entry-title">' + t2 + '</div>' +
-        '<div class="entry-sub">' + badges + (entry.notes ? ' ' + escapeHtml(entry.notes) : '') + '</div>';
-    }
-
-    main.addEventListener('click', function(){ openEntryModal(type, entry); });
-    row.appendChild(main);
-
-    var del = document.createElement('button');
-    del.className = 'del-btn';
-    del.innerHTML = '✕';
-    del.addEventListener('click', function(){
-      if(confirm('Delete this entry?')){
-        deleteEntry(type, entry.id);
-        renderAll();
-        showToast('Deleted');
-      }
-    });
-    row.appendChild(del);
-    return row;
-  }
-
-  function renderList(containerId, type, entries, emptyMsg){
-    var container = document.getElementById(containerId);
-    if(!container) return;
-    container.innerHTML = '';
-    if(!entries.length){
-      var empty = document.createElement('div');
-      empty.className = 'empty-state';
-      empty.textContent = emptyMsg;
-      container.appendChild(empty);
+  // ---------------- Hero + stats ----------------
+  function renderHero(){
+    var hero = document.getElementById('heroCard');
+    var age = computeAgeLabel(state.baby.birthDate);
+    if(!state.baby.name && !age){
+      hero.innerHTML = '<div class="hero-empty">Add your baby\'s name and birth date in Settings to see them here.</div>';
       return;
     }
-    entries.forEach(function(e){ container.appendChild(renderEntryRow(type, e)); });
+    hero.innerHTML =
+      (age ? '<div><div class="hero-age-label">' + age.unit.toUpperCase() + '</div><div class="hero-age">' + age.big + '</div></div>' : '<div></div>') +
+      '<div style="text-align:right;">' +
+        '<div class="hero-baby-name">' + escapeHtml(state.baby.name || 'Baby') + '</div>' +
+        (state.baby.birthDate ? '<div class="hero-born">Born ' + formatDateShort(state.baby.birthDate) + '</div>' : '') +
+      '</div>';
   }
 
-  function sortByTimeField(entries, field){
-    return entries.slice().sort(function(a,b){ return a[field] < b[field] ? -1 : (a[field] > b[field] ? 1 : 0); });
-  }
-
-  function computeChips(){
+  function renderStats(){
     var sleeps = getEntriesForDate('sleep', selectedDate);
-    var totalSleepMin = sleeps.reduce(function(sum, e){
-      if(!e.end) return sum;
-      return sum + minutesBetween(e.start, e.end);
-    }, 0);
+    var totalSleepMin = sleeps.reduce(function(sum, e){ return e.end ? sum + minutesBetween(e.start, e.end) : sum; }, 0);
     var feeds = getEntriesForDate('feeding', selectedDate);
     var diapers = getEntriesForDate('diaper', selectedDate);
     var wetCount = diapers.filter(function(d){ return d.wet; }).length;
     var dirtyCount = diapers.filter(function(d){ return d.dirty; }).length;
+    var totalOz = feeds.filter(function(f){ return f.method === 'bottle' && f.bottleOz; }).reduce(function(s,f){ return s + f.bottleOz; }, 0);
+    var totalBreastMin = feeds.filter(function(f){ return f.method === 'breast' && f.durationMin; }).reduce(function(s,f){ return s + f.durationMin; }, 0);
+    var lastFeed = feeds.length ? formatTime12(extractTime(feeds.slice().sort(function(a,b){ return a.time < b.time ? 1 : -1; })[0].time)) : null;
 
-    document.getElementById('chipSleep').textContent = formatDurationMin(totalSleepMin) + ' sleep';
-    document.getElementById('chipFeed').textContent = feeds.length + ' feed' + (feeds.length === 1 ? '' : 's');
-    document.getElementById('chipDiaper').textContent = wetCount + ' wet · ' + dirtyCount + ' dirty';
+    var grid = document.getElementById('statGrid');
+    grid.innerHTML =
+      '<div class="stat-card feed"><div class="stat-label">Feeds</div><div class="stat-value">' + feeds.length + '</div><div class="stat-caption">' + (lastFeed ? 'last ' + lastFeed : 'none yet') + '</div></div>' +
+      '<div class="stat-card diaper"><div class="stat-label">Diapers</div><div class="stat-value">' + diapers.length + '</div><div class="stat-caption">' + wetCount + ' wet · ' + dirtyCount + ' dirty</div></div>' +
+      '<div class="stat-card sleep"><div class="stat-label">Sleep</div><div class="stat-value">' + formatDurationMin(totalSleepMin || 0) + '</div><div class="stat-caption">' + sleeps.length + ' session' + (sleeps.length === 1 ? '' : 's') + '</div></div>' +
+      '<div class="stat-card neutral"><div class="stat-label">Feeding volume</div><div class="stat-value">' + (totalOz || 0) + ' oz</div><div class="stat-caption">' + (totalBreastMin || 0) + ' min breast</div></div>';
   }
 
   function renderHeaderLabels(){
     document.getElementById('babyNameLabel').textContent = state.baby.name || 'Baby';
+    document.getElementById('todayEyebrow').textContent = formatDateLong(selectedDate);
+    document.getElementById('todayGreeting').textContent = 'Good ' + greetingWord() + (state.settings.caregiverName ? ', ' + state.settings.caregiverName : '');
   }
 
   function renderSettingsForm(){
@@ -1029,56 +1076,53 @@
 
   function renderAll(){
     renderHeaderLabels();
-    computeChips();
+    renderHero();
+    renderStats();
     renderSleepingNowCard();
 
-    var sleeps = sortByTimeField(getEntriesForDate('sleep', selectedDate), 'start');
-    var feeds = sortByTimeField(getEntriesForDate('feeding', selectedDate), 'time');
-    var diapers = sortByTimeField(getEntriesForDate('diaper', selectedDate), 'time');
+    var all = unifiedEntriesForDate(selectedDate);
+    renderRowList('recentList', all.slice(0, 5), 'No activity logged yet today.');
 
-    renderList('todaySleepList', 'sleep', sleeps, 'No sleep logged yet.');
-    renderList('todayFeedList', 'feeding', feeds, 'No feedings logged yet.');
-    renderList('todayDiaperList', 'diaper', diapers, 'No diapers logged yet.');
-
-    renderList('sleepList', 'sleep', sleeps, 'No sleep logged for this day.');
-    renderList('feedList', 'feeding', feeds, 'No feedings logged for this day.');
-    renderList('diaperList', 'diaper', diapers, 'No diapers logged for this day.');
+    var filtered = activeFilter === 'all' ? all : all.filter(function(i){ return i.type === activeFilter; });
+    renderRowList('fullLogList', filtered, 'No entries for this filter.');
 
     if(currentView === 'settings') renderSettingsForm();
   }
 
   // ---------------- Settings bindings ----------------
   document.getElementById('babyNameInput').addEventListener('input', function(){
-    state.baby.name = this.value;
-    scheduleSave();
-    renderHeaderLabels();
+    state.baby.name = this.value; scheduleSave(); renderHeaderLabels(); renderHero();
   });
   document.getElementById('babyBirthInput').addEventListener('change', function(){
-    state.baby.birthDate = this.value || null;
-    scheduleSave();
+    state.baby.birthDate = this.value || null; scheduleSave(); renderHero();
   });
   document.getElementById('caregiverInput').addEventListener('input', function(){
-    state.settings.caregiverName = this.value;
-    scheduleSave();
+    state.settings.caregiverName = this.value; scheduleSave(); renderHeaderLabels();
   });
 
   // ---------------- Backup / Restore ----------------
-  document.getElementById('exportBtn').addEventListener('click', function(){
+  document.getElementById('exportBtn').addEventListener('click', async function(){
     flushSave();
-    var payload = {
-      app: 'newborn-daily-log',
-      exportedAt: new Date().toISOString(),
-      schemaVersion: state.schemaVersion,
-      data: state
-    };
-    var blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    var payload = { app: 'newborn-daily-log', exportedAt: new Date().toISOString(), schemaVersion: state.schemaVersion, data: state };
+    var jsonStr = JSON.stringify(payload, null, 2);
+    var filename = 'newborn-daily-log-backup-' + todayStr() + '.json';
+
+    var downloads = null;
+    try{
+      if(window.claude && typeof window.claude.use === 'function'){ downloads = await window.claude.use('downloads'); }
+    }catch(e){ downloads = null; }
+
+    if(downloads){
+      try{ await downloads.save({ filename: filename, data: jsonStr }); showToast('Backup saved'); }
+      catch(err){ showToast(err && err.code === 'declined' ? 'Backup cancelled' : 'Could not save backup — try again'); }
+      return;
+    }
+
+    var blob = new Blob([jsonStr], { type: 'application/json' });
     var url = URL.createObjectURL(blob);
     var a = document.createElement('a');
-    a.href = url;
-    a.download = 'newborn-daily-log-backup-' + todayStr() + '.json';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
     URL.revokeObjectURL(url);
     showToast('Backup downloaded');
   });
@@ -1089,34 +1133,18 @@
     var reader = new FileReader();
     reader.onload = function(){
       var parsed;
-      try{
-        parsed = JSON.parse(reader.result);
-      }catch(err){
-        showToast('That file is not valid JSON');
-        e.target.value = '';
-        return;
-      }
+      try{ parsed = JSON.parse(reader.result); }
+      catch(err){ showToast('That file is not valid JSON'); e.target.value = ''; return; }
       if(!parsed || parsed.app !== 'newborn-daily-log' || !parsed.data){
-        showToast('This file does not look like a Newborn Daily Log backup');
-        e.target.value = '';
-        return;
+        showToast('This file does not look like a Newborn Daily Log backup'); e.target.value = ''; return;
       }
       var incoming = migrate(parsed.data);
-      var choice = window.prompt(
-        'Restore backup:\nType "replace" to overwrite all current data,\nor "merge" to combine it with what you have now.\n(Cancel to abort)',
-        'merge'
-      );
+      var choice = window.prompt('Restore backup:\nType "replace" to overwrite all current data,\nor "merge" to combine it with what you have now.\n(Cancel to abort)', 'merge');
       if(!choice){ e.target.value = ''; return; }
       choice = choice.trim().toLowerCase();
       if(choice === 'replace'){
-        if(!confirm('This will overwrite ALL data currently in this browser. Continue?')){
-          e.target.value = '';
-          return;
-        }
-        state = incoming;
-        flushSave();
-        applyTheme();
-        renderAll();
+        if(!confirm('This will overwrite ALL data currently in this browser. Continue?')){ e.target.value = ''; return; }
+        state = incoming; flushSave(); applyTheme(); renderAll();
         showToast('Restored (replaced all data)');
       } else if(choice === 'merge'){
         var countBefore = state.sleepEntries.length + state.feedingEntries.length + state.diaperEntries.length;
@@ -1124,13 +1152,10 @@
         state.feedingEntries = mergeById(state.feedingEntries, incoming.feedingEntries);
         state.diaperEntries = mergeById(state.diaperEntries, incoming.diaperEntries);
         if(!state.baby.name && incoming.baby && incoming.baby.name) state.baby.name = incoming.baby.name;
-        flushSave();
-        renderAll();
+        flushSave(); renderAll();
         var countAfter = state.sleepEntries.length + state.feedingEntries.length + state.diaperEntries.length;
         showToast('Merged. ' + (countAfter - countBefore) + ' new entries added.');
-      } else {
-        showToast('Restore cancelled');
-      }
+      } else { showToast('Restore cancelled'); }
       e.target.value = '';
     };
     reader.readAsText(file);
@@ -1139,7 +1164,7 @@
   function mergeById(current, incoming){
     var byId = {};
     current.forEach(function(e){ byId[e.id] = e; });
-    incoming.forEach(function(e){ byId[e.id] = e; }); // imported wins on collision
+    incoming.forEach(function(e){ byId[e.id] = e; });
     return Object.keys(byId).map(function(k){ return byId[k]; });
   }
 
@@ -1147,7 +1172,6 @@
   applyTheme();
   renderAll();
 
-  // Live ticker for "sleeping now" elapsed time
   setInterval(function(){
     document.querySelectorAll('[data-start-iso]').forEach(function(el){
       var iso = el.getAttribute('data-start-iso');
