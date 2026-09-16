@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;0,700;1,500&family=Karla:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <style>
   :root{
     --bg:#FAF7F5;
@@ -33,6 +34,13 @@
     --font-display: "Lora", Georgia, "Times New Roman", serif;
     --font-body: "Karla", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     --brand-accent: #D9799E;
+
+    /* Chart marks: deeper/more saturated than the pastel UI tints above (validated for CVD-safe categorical use) */
+    --chart-feed:#2F9C82;
+    --chart-diaper:#C99A2E;   --chart-diaper-dirty:#3D63A8;
+    --chart-sleep:#7859C9;
+    --chart-med:#D6487C;
+    --chart-grid: rgba(51,44,56,0.08);
   }
 
   :root[data-theme="dark"]{
@@ -55,6 +63,12 @@
     --danger:#C97A8A;
     --backdrop: rgba(0,0,0,0.6);
     --brand-accent: #E39FBC;
+
+    --chart-feed:#3FA98F;
+    --chart-diaper:#A8862E;   --chart-diaper-dirty:#4C74BE;
+    --chart-sleep:#8B76C9;
+    --chart-med:#D6608C;
+    --chart-grid: rgba(237,231,240,0.10);
   }
 
   *{ box-sizing: border-box; }
@@ -359,6 +373,36 @@
   }
   .muted-small{ font-size:11px; color: var(--text-muted); font-weight:700; letter-spacing: 0.05em; text-transform: uppercase; }
 
+  /* History: charts & tables */
+  .chart-wrap{ position:relative; height:240px; width:100%; }
+  .table-wrap{ overflow-x:auto; }
+  .history-table{ width:100%; border-collapse:collapse; font-size:13px; font-variant-numeric: tabular-nums; }
+  .history-table th, .history-table td{
+    text-align:left; padding:8px 10px; border-bottom:1px solid var(--border);
+    white-space:nowrap;
+  }
+  .history-table th{
+    font-size:10.5px; font-weight:700; letter-spacing:0.05em; text-transform:uppercase;
+    color: var(--text-muted); background: var(--surface-2);
+  }
+  .history-table tr:last-child td{ border-bottom:none; }
+  .history-table td.empty-day{ color: var(--text-muted); }
+
+  .print-only{ display:none; }
+  @media print{
+    .no-print{ display:none !important; }
+    .print-only{ display:block !important; }
+    #mobileTabBar, #desktopSidebar, #app-header, #brandBar, #toast, dialog{ display:none !important; }
+    #bodyRow{ display:block !important; }
+    main{ padding:0; max-width:100%; }
+    body{ background:#fff; }
+    :root, :root[data-theme="dark"]{
+      --bg:#fff; --surface:#fff; --surface-2:#f6f6f6; --text:#111; --text-muted:#555; --border:#ccc;
+    }
+    .card{ box-shadow:none; border:1px solid #ccc; break-inside:avoid; page-break-inside:avoid; }
+    .chart-wrap{ height:220px; }
+  }
+
   /* Desktop layout */
   @media (min-width: 768px){
     #bodyRow{ display:grid; grid-template-columns: 220px 1fr; }
@@ -417,6 +461,7 @@
     <nav id="desktopSidebar">
       <button data-view="today" class="active"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11.5L12 4l8 7.5"/><path d="M6 10v9h5v-5h2v5h5v-9"/></svg> Today</button>
       <button data-view="log"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4.5 6h.01M4.5 12h.01M4.5 18h.01"/></svg> Care Log</button>
+      <button data-view="history"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V13"/><path d="M12 20V6"/><path d="M20 20V10"/></svg> History</button>
       <button data-view="settings"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.34 1.87l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.7 1.7 0 00-1.87-.34 1.7 1.7 0 00-1 1.55V21a2 2 0 11-4 0v-.09a1.7 1.7 0 00-1-1.56 1.7 1.7 0 00-1.87.34l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.7 1.7 0 00.34-1.87 1.7 1.7 0 00-1.55-1H3a2 2 0 110-4h.09a1.7 1.7 0 001.56-1 1.7 1.7 0 00-.34-1.87l-.06-.06a2 2 0 112.83-2.83l.06.06a1.7 1.7 0 001.87.34h0a1.7 1.7 0 001-1.55V3a2 2 0 114 0v.09a1.7 1.7 0 001 1.56 1.7 1.7 0 001.87-.34l.06-.06a2 2 0 112.83 2.83l-.06.06a1.7 1.7 0 00-.34 1.87v0a1.7 1.7 0 001.55 1H21a2 2 0 110 4h-.09a1.7 1.7 0 00-1.56 1z"/></svg> Settings</button>
     </nav>
 
@@ -476,6 +521,76 @@
         <div class="entry-list" id="fullLogList"></div>
       </section>
 
+      <section class="view" id="view-history" hidden>
+        <div class="page-header no-print">
+          <div class="page-eyebrow">GROWTH &amp; PATTERNS</div>
+          <h1 class="page-title">History</h1>
+        </div>
+
+        <div id="printHeader" class="print-only"></div>
+
+        <div class="card no-print">
+          <div class="section-header"><div class="section-title">Time range</div></div>
+          <div class="pill-row" id="rangePills">
+            <button class="pill active" data-range="7">7 days</button>
+            <button class="pill" data-range="14">14 days</button>
+            <button class="pill" data-range="30">30 days</button>
+            <button class="pill" data-range="all">All time</button>
+            <button class="pill" data-range="custom">Custom</button>
+          </div>
+          <div class="row-inline" id="customRangeRow" style="display:none; margin-top:10px;">
+            <div class="field-row"><label>From</label><input type="date" id="rangeFrom"></div>
+            <div class="field-row"><label>To</label><input type="date" id="rangeTo"></div>
+          </div>
+          <button class="btn primary" id="printBtn" style="margin-top:12px;">🖨 Print / Save PDF</button>
+        </div>
+
+        <div class="card">
+          <div class="section-header"><div class="section-title"><span class="dot sleep"></span>Sleep — duration &amp; frequency</div></div>
+          <div class="chart-wrap"><canvas id="chartSleep"></canvas></div>
+        </div>
+
+        <div class="card">
+          <div class="section-header"><div class="section-title"><span class="dot diaper"></span>Diapers — wet vs. dirty</div></div>
+          <div class="chart-wrap"><canvas id="chartDiaper"></canvas></div>
+        </div>
+
+        <div class="card">
+          <div class="section-header"><div class="section-title"><span class="dot feed"></span>Feeding — volume &amp; frequency</div></div>
+          <div class="chart-wrap"><canvas id="chartFeed"></canvas></div>
+        </div>
+
+        <div class="card">
+          <div class="section-header"><div class="section-title"><span class="dot medication"></span>Medications given</div></div>
+          <div class="chart-wrap"><canvas id="chartMed"></canvas></div>
+        </div>
+
+        <div class="card">
+          <div class="section-header"><div class="section-title">Everything, at a glance</div></div>
+          <div class="chart-wrap"><canvas id="chartStacked"></canvas></div>
+        </div>
+
+        <div class="card">
+          <div class="section-title" style="margin-bottom:10px;">Feed log</div>
+          <div class="table-wrap"><table class="history-table" id="tableFeed"></table></div>
+        </div>
+
+        <div class="card">
+          <div class="section-title" style="margin-bottom:10px;">Sleep log</div>
+          <div class="table-wrap"><table class="history-table" id="tableSleep"></table></div>
+        </div>
+
+        <div class="card">
+          <div class="section-title" style="margin-bottom:10px;">Diaper log</div>
+          <div class="table-wrap"><table class="history-table" id="tableDiaper"></table></div>
+        </div>
+
+        <div class="card">
+          <div class="section-title" style="margin-bottom:10px;">Medication log</div>
+          <div class="table-wrap"><table class="history-table" id="tableMed"></table></div>
+        </div>
+      </section>
+
       <section class="view" id="view-settings" hidden>
         <div class="page-header">
           <div class="page-eyebrow">SETUP</div>
@@ -517,6 +632,7 @@
   <nav id="mobileTabBar">
     <button data-view="today" class="active"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11.5L12 4l8 7.5"/><path d="M6 10v9h5v-5h2v5h5v-9"/></svg>Today</button>
     <button data-view="log"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4.5 6h.01M4.5 12h.01M4.5 18h.01"/></svg>Care Log</button>
+    <button data-view="history"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V13"/><path d="M12 20V6"/><path d="M20 20V10"/></svg>History</button>
     <button data-view="settings"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.34 1.87l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.7 1.7 0 00-1.87-.34 1.7 1.7 0 00-1 1.55V21a2 2 0 11-4 0v-.09a1.7 1.7 0 00-1-1.56 1.7 1.7 0 00-1.87.34l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.7 1.7 0 00.34-1.87 1.7 1.7 0 00-1.55-1H3a2 2 0 110-4h.09a1.7 1.7 0 001.56-1 1.7 1.7 0 00-.34-1.87l-.06-.06a2 2 0 112.83-2.83l.06.06a1.7 1.7 0 001.87.34h0a1.7 1.7 0 001-1.55V3a2 2 0 114 0v.09a1.7 1.7 0 001 1.56 1.7 1.7 0 001.87-.34l.06-.06a2 2 0 112.83 2.83l-.06.06a1.7 1.7 0 00-.34 1.87v0a1.7 1.7 0 001.55 1H21a2 2 0 110 4h-.09a1.7 1.7 0 00-1.56 1z"/></svg>Settings</button>
   </nav>
 </div>
@@ -677,6 +793,7 @@
       btn.classList.toggle('active', btn.getAttribute('data-view') === name);
     });
     renderAll();
+    if(name === 'history') renderHistory();
   }
   document.querySelectorAll('#desktopSidebar button, #mobileTabBar button').forEach(function(btn){
     btn.addEventListener('click', function(){ switchView(btn.getAttribute('data-view')); });
@@ -725,6 +842,7 @@
       b.classList.toggle('active', b.getAttribute('data-theme-choice') === (state.settings.theme || 'system'));
     });
     document.getElementById('themeToggle').textContent = resolveTheme() === 'dark' ? '☀️' : '🌙';
+    if(currentView === 'history') renderCharts();
   }
   document.getElementById('themeToggle').addEventListener('click', function(){
     var resolved = resolveTheme();
@@ -765,14 +883,15 @@
       html += '<div class="modal-title">' + (isEdit ? 'Edit Sleep' : 'Add Sleep') + '</div>';
       html += '<div class="row-inline">';
       html += '<div class="field-row"><label>Start</label><input type="time" id="f_start" value="' + startTime + '"></div>';
-      html += '<div class="field-row"><label>End</label><input type="time" id="f_end" value="' + endTime + '"></div>';
+      html += '<div class="field-row"><label>End</label><input type="time" id="f_end" value="' + endTime + '"><div class="muted-small" style="text-transform:none; letter-spacing:normal; font-weight:600; margin-top:4px;">Leave empty if still sleeping.</div></div>';
       html += '</div>';
-      html += '<div class="muted-small" style="text-transform:none; letter-spacing:normal; font-weight:600;">Leave End blank if baby is still sleeping.</div>';
       html += '<div class="field-row"><label>Notes (optional)</label><textarea id="f_notes">' + (entry && entry.notes ? escapeHtml(entry.notes) : '') + '</textarea></div>';
     } else if(type === 'feeding'){
       var method = entry ? entry.method : 'breast';
-      var time = entry ? extractTime(entry.time) : nowTimeStr();
-      var side = entry ? entry.side : 'L';
+      var side = entry ? (entry.side || 'L') : 'L';
+      var singleTime = entry ? extractTime(entry.time || nowTimeStr()) : nowTimeStr();
+      var breastStart = (entry && entry.method === 'breast') ? extractTime(entry.start || entry.time || nowTimeStr()) : nowTimeStr();
+      var breastEnd = (entry && entry.method === 'breast' && entry.end) ? extractTime(entry.end) : '';
       html += '<div class="modal-title">' + (isEdit ? 'Edit Feeding' : 'Add Feeding') + '</div>';
       html += '<div class="field-row"><label>Method</label><div class="seg" id="f_method">';
       ['breast','bottle','solid'].forEach(function(m){
@@ -780,7 +899,6 @@
         html += '<button data-val="' + m + '" class="' + (m === method ? 'active' : '') + '">' + label + '</button>';
       });
       html += '</div></div>';
-      html += '<div class="field-row"><label>Time</label><input type="time" id="f_time" value="' + time + '"></div>';
 
       html += '<div id="feedFieldsBreast" class="field-row" style="' + (method === 'breast' ? '' : 'display:none;') + '">';
       html += '<label>Side</label><div class="seg" id="f_side">';
@@ -789,7 +907,14 @@
         html += '<button data-val="' + s + '" class="' + (s === side ? 'active' : '') + '">' + label + '</button>';
       });
       html += '</div>';
-      html += '<label style="margin-top:8px;">Duration (minutes, optional)</label><input type="number" id="f_duration" min="0" step="1" value="' + (entry && entry.durationMin != null ? entry.durationMin : '') + '">';
+      html += '<div class="row-inline" style="margin-top:8px;">';
+      html += '<div class="field-row"><label>Start</label><input type="time" id="f_start" value="' + breastStart + '"></div>';
+      html += '<div class="field-row"><label>End</label><input type="time" id="f_end" value="' + breastEnd + '"><div class="muted-small" style="text-transform:none; letter-spacing:normal; font-weight:600; margin-top:4px;">Leave empty if still feeding.</div></div>';
+      html += '</div>';
+      html += '</div>';
+
+      html += '<div id="feedFieldsTime" class="field-row" style="' + (method !== 'breast' ? '' : 'display:none;') + '">';
+      html += '<label>Time</label><input type="time" id="f_time" value="' + singleTime + '">';
       html += '</div>';
 
       html += '<div id="feedFieldsBottle" class="field-row" style="' + (method === 'bottle' ? '' : 'display:none;') + '">';
@@ -833,6 +958,7 @@
           btn.classList.add('active');
           var val = btn.getAttribute('data-val');
           document.getElementById('feedFieldsBreast').style.display = (val === 'breast') ? '' : 'none';
+          document.getElementById('feedFieldsTime').style.display = (val !== 'breast') ? '' : 'none';
           document.getElementById('feedFieldsBottle').style.display = (val === 'bottle') ? '' : 'none';
         });
       });
@@ -888,26 +1014,37 @@
     } else if(type === 'feeding'){
       var methodBtn = document.querySelector('#f_method button.active');
       var method = methodBtn ? methodBtn.getAttribute('data-val') : 'breast';
-      var time = document.getElementById('f_time').value;
-      if(!time){ showToast('Time is required'); return; }
-      var timeIso = combineDateTime(dateStr, time);
       var notes2 = document.getElementById('f_notes').value;
-      var side = null, durationMin = null, bottleOz = null;
+      var side = null, bottleOz = null, timeIso = null, startIso2 = null, endIso2 = null;
+
       if(method === 'breast'){
         var sideBtn = document.querySelector('#f_side button.active');
         side = sideBtn ? sideBtn.getAttribute('data-val') : 'L';
-        var durVal = document.getElementById('f_duration').value;
-        durationMin = durVal !== '' ? Number(durVal) : null;
-      } else if(method === 'bottle'){
-        var ozVal = document.getElementById('f_oz').value;
-        bottleOz = ozVal !== '' ? Number(ozVal) : null;
-      }
-      if(existing){
-        existing.method = method; existing.time = timeIso; existing.side = side;
-        existing.durationMin = durationMin; existing.bottleOz = bottleOz; existing.notes = notes2;
+        var bStart = document.getElementById('f_start').value;
+        var bEnd = document.getElementById('f_end').value;
+        if(!bStart){ showToast('Start time is required'); return; }
+        startIso2 = combineDateTime(dateStr, bStart);
+        if(bEnd){
+          endIso2 = combineDateTime(dateStr, bEnd);
+          if(bEnd < bStart){ endIso2 = combineDateTime(addDays(dateStr, 1), bEnd); }
+        }
       } else {
-        state.feedingEntries.push({ id: uuid(), babyId: state.baby.id, date: dateStr, time: timeIso,
-          method: method, side: side, durationMin: durationMin, bottleOz: bottleOz, notes: notes2 });
+        var fTime = document.getElementById('f_time').value;
+        if(!fTime){ showToast('Time is required'); return; }
+        timeIso = combineDateTime(dateStr, fTime);
+        if(method === 'bottle'){
+          var ozVal = document.getElementById('f_oz').value;
+          bottleOz = ozVal !== '' ? Number(ozVal) : null;
+        }
+      }
+
+      if(existing){
+        existing.method = method; existing.side = side; existing.notes = notes2;
+        existing.time = timeIso; existing.start = startIso2; existing.end = endIso2; existing.bottleOz = bottleOz;
+        existing.durationMin = null;
+      } else {
+        state.feedingEntries.push({ id: uuid(), babyId: state.baby.id, date: dateStr,
+          method: method, side: side, time: timeIso, start: startIso2, end: endIso2, bottleOz: bottleOz, notes: notes2 });
       }
     } else if(type === 'diaper'){
       var time2 = document.getElementById('f_time').value;
@@ -957,7 +1094,7 @@
   // ---------------- Unified entry helpers ----------------
   function unifiedEntriesForDate(dateStr){
     var list = [];
-    getEntriesForDate('feeding', dateStr).forEach(function(e){ list.push({ type:'feeding', sortKey: e.time, entry: e }); });
+    getEntriesForDate('feeding', dateStr).forEach(function(e){ list.push({ type:'feeding', sortKey: (e.method === 'breast' && e.start) ? e.start : e.time, entry: e }); });
     getEntriesForDate('diaper', dateStr).forEach(function(e){ list.push({ type:'diaper', sortKey: e.time, entry: e }); });
     getEntriesForDate('sleep', dateStr).forEach(function(e){ list.push({ type:'sleep', sortKey: e.start, entry: e }); });
     getEntriesForDate('medication', dateStr).forEach(function(e){ list.push({ type:'medication', sortKey: e.time, entry: e }); });
@@ -975,7 +1112,12 @@
       var title = '';
       if(entry.method === 'breast'){
         var sideLabel = entry.side === 'L' ? 'Left' : (entry.side === 'R' ? 'Right' : 'Both');
-        title = 'Breast · ' + sideLabel + (entry.durationMin ? ' · ' + entry.durationMin + ' min' : '');
+        if(entry.start){
+          var breastDur = entry.end ? formatDurationMin(minutesBetween(entry.start, entry.end)) : 'Still feeding';
+          title = 'Breast · ' + sideLabel + ' · ' + breastDur;
+        } else {
+          title = 'Breast · ' + sideLabel + (entry.durationMin ? ' · ' + entry.durationMin + ' min' : '');
+        }
       } else if(entry.method === 'bottle'){
         title = 'Bottle' + (entry.bottleOz ? ' · ' + entry.bottleOz + ' oz' : '');
       } else {
@@ -998,13 +1140,12 @@
   }
 
   function entryTimeLabel(type, entry){
-    if(type === 'sleep'){
+    if(type === 'sleep' || (type === 'feeding' && entry.method === 'breast' && entry.start)){
       var startT = formatTime12(extractTime(entry.start));
       var endT = entry.end ? formatTime12(extractTime(entry.end)) : '';
       return endT ? (startT + ' – ' + endT) : startT;
     }
-    var t = type === 'feeding' ? entry.time : entry.time;
-    return formatTime12(extractTime(t));
+    return formatTime12(extractTime(entry.time));
   }
 
   function renderUnifiedRow(item){
@@ -1089,7 +1230,11 @@
     var wetCount = diapers.filter(function(d){ return d.wet; }).length;
     var dirtyCount = diapers.filter(function(d){ return d.dirty; }).length;
     var totalOz = feeds.filter(function(f){ return f.method === 'bottle' && f.bottleOz; }).reduce(function(s,f){ return s + f.bottleOz; }, 0);
-    var totalBreastMin = feeds.filter(function(f){ return f.method === 'breast' && f.durationMin; }).reduce(function(s,f){ return s + f.durationMin; }, 0);
+    var totalBreastMin = feeds.filter(function(f){ return f.method === 'breast'; }).reduce(function(s,f){
+      if(f.start && f.end) return s + minutesBetween(f.start, f.end);
+      if(f.durationMin) return s + f.durationMin;
+      return s;
+    }, 0);
     var feedCaption = (totalOz || totalBreastMin) ? (totalOz + 'oz · ' + totalBreastMin + 'm breast') : 'none yet';
     var lastMed = meds.length ? meds.slice().sort(function(a,b){ return a.time < b.time ? 1 : -1; })[0].name : null;
 
@@ -1207,6 +1352,263 @@
     incoming.forEach(function(e){ byId[e.id] = e; });
     return Object.keys(byId).map(function(k){ return byId[k]; });
   }
+
+  // ---------------- History: range, aggregation, charts, tables ----------------
+  var historyRangeMode = '7';
+  var historyRangeCustom = { from: null, to: null };
+  var chartInstances = {};
+
+  function cssVar(name){ return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+
+  function formatAxisLabel(dateStr){
+    var d = parseDateStr(dateStr);
+    var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return months[d.getMonth()] + ' ' + d.getDate();
+  }
+
+  function dateRangeArray(startStr, endStr){
+    var arr = []; var cur = startStr; var guard = 0;
+    while(cur <= endStr && guard < 3660){ arr.push(cur); cur = addDays(cur, 1); guard++; }
+    return arr;
+  }
+
+  function earliestEntryDate(){
+    var all = [];
+    state.sleepEntries.forEach(function(e){ all.push(e.date); });
+    state.feedingEntries.forEach(function(e){ all.push(e.date); });
+    state.diaperEntries.forEach(function(e){ all.push(e.date); });
+    state.medicationEntries.forEach(function(e){ all.push(e.date); });
+    return all.length ? all.reduce(function(a,b){ return a < b ? a : b; }) : todayStr();
+  }
+
+  function computeHistoryRange(){
+    var end = todayStr();
+    var start;
+    if(historyRangeMode === 'custom'){
+      start = historyRangeCustom.from || addDays(end, -6);
+      end = historyRangeCustom.to || end;
+    } else if(historyRangeMode === 'all'){
+      start = earliestEntryDate();
+    } else {
+      start = addDays(end, -(parseInt(historyRangeMode, 10) - 1));
+    }
+    if(start > end){ var tmp = start; start = end; end = tmp; }
+    return { start: start, end: end };
+  }
+
+  function aggregateDay(dateStr){
+    var sleeps = getEntriesForDate('sleep', dateStr);
+    var feeds = getEntriesForDate('feeding', dateStr);
+    var diapers = getEntriesForDate('diaper', dateStr);
+    var meds = getEntriesForDate('medication', dateStr);
+
+    var sleepMin = sleeps.reduce(function(s,e){ return e.end ? s + minutesBetween(e.start, e.end) : s; }, 0);
+    var wetCount = diapers.filter(function(d){ return d.wet; }).length;
+    var dirtyCount = diapers.filter(function(d){ return d.dirty; }).length;
+    var breastMin = feeds.filter(function(f){ return f.method === 'breast'; }).reduce(function(s,f){
+      if(f.start && f.end) return s + minutesBetween(f.start, f.end);
+      if(f.durationMin) return s + f.durationMin;
+      return s;
+    }, 0);
+    var bottleOz = feeds.filter(function(f){ return f.method === 'bottle' && f.bottleOz; }).reduce(function(s,f){ return s + f.bottleOz; }, 0);
+
+    return {
+      date: dateStr,
+      sleepCount: sleeps.length, sleepMin: sleepMin,
+      feedCount: feeds.length, breastMin: breastMin, bottleOz: bottleOz,
+      wetCount: wetCount, dirtyCount: dirtyCount, diaperCount: diapers.length,
+      medCount: meds.length, meds: meds
+    };
+  }
+
+  function buildRangeData(){
+    var range = computeHistoryRange();
+    return dateRangeArray(range.start, range.end).map(aggregateDay);
+  }
+
+  function medNameSeries(rangeDays){
+    var counts = {};
+    rangeDays.forEach(function(d){
+      d.meds.forEach(function(m){ counts[m.name] = (counts[m.name] || 0) + 1; });
+    });
+    var names = Object.keys(counts).sort(function(a,b){ return counts[b] - counts[a]; });
+    return { top: names.slice(0, 4), hasOther: names.length > 4 };
+  }
+
+  function destroyChart(id){
+    if(chartInstances[id]){ chartInstances[id].destroy(); delete chartInstances[id]; }
+  }
+
+  function baseChartOptions(yTitle, y1Title){
+    var opts = {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: true, position: 'bottom', labels: { usePointStyle: true, boxWidth: 8, color: cssVar('--text') } },
+        tooltip: { enabled: true }
+      },
+      scales: {
+        x: { grid: { display: false }, ticks: { color: cssVar('--text-muted') } },
+        y: { beginAtZero: true, grace: 1, grid: { color: cssVar('--chart-grid') }, ticks: { color: cssVar('--text-muted'), precision: 0 },
+             title: { display: !!yTitle, text: yTitle, color: cssVar('--text-muted') } }
+      }
+    };
+    if(y1Title){
+      opts.scales.y1 = { position: 'right', beginAtZero: true, grace: 1, grid: { drawOnChartArea: false }, ticks: { color: cssVar('--text-muted'), precision: 0 },
+        title: { display: true, text: y1Title, color: cssVar('--text-muted') } };
+    }
+    return opts;
+  }
+
+  function renderCharts(){
+    if(typeof Chart === 'undefined') return;
+    var rangeDays = buildRangeData();
+    var labels = rangeDays.map(function(d){ return formatAxisLabel(d.date); });
+
+    destroyChart('chartSleep');
+    chartInstances.chartSleep = new Chart(document.getElementById('chartSleep'), {
+      data: { labels: labels, datasets: [
+        { type: 'bar', label: 'Sleep (hours)', data: rangeDays.map(function(d){ return +(d.sleepMin/60).toFixed(2); }),
+          backgroundColor: cssVar('--chart-sleep'), borderRadius: 4, yAxisID: 'y' },
+        { type: 'line', label: 'Sessions', data: rangeDays.map(function(d){ return d.sleepCount; }),
+          borderColor: cssVar('--chart-med'), backgroundColor: cssVar('--chart-med'),
+          pointBorderColor: cssVar('--surface'), pointBorderWidth: 2,
+          tension: 0.3, pointRadius: 5, borderWidth: 2.5, yAxisID: 'y1' }
+      ]},
+      options: baseChartOptions('Hours', 'Sessions')
+    });
+
+    destroyChart('chartDiaper');
+    chartInstances.chartDiaper = new Chart(document.getElementById('chartDiaper'), {
+      type: 'line',
+      data: { labels: labels, datasets: [
+        { label: 'Wet', data: rangeDays.map(function(d){ return d.wetCount; }),
+          borderColor: cssVar('--chart-diaper'), backgroundColor: cssVar('--chart-diaper'), tension: 0.3, pointRadius: 4, borderWidth: 2 },
+        { label: 'Dirty', data: rangeDays.map(function(d){ return d.dirtyCount; }),
+          borderColor: cssVar('--chart-diaper-dirty'), backgroundColor: cssVar('--chart-diaper-dirty'), tension: 0.3, pointRadius: 4, borderWidth: 2 }
+      ]},
+      options: baseChartOptions('Count')
+    });
+
+    destroyChart('chartFeed');
+    chartInstances.chartFeed = new Chart(document.getElementById('chartFeed'), {
+      data: { labels: labels, datasets: [
+        { type: 'bar', label: 'Bottle volume (oz)', data: rangeDays.map(function(d){ return d.bottleOz; }),
+          backgroundColor: cssVar('--chart-feed'), borderRadius: 4, yAxisID: 'y' },
+        { type: 'line', label: 'Feeds', data: rangeDays.map(function(d){ return d.feedCount; }),
+          borderColor: cssVar('--chart-diaper'), backgroundColor: cssVar('--chart-diaper'),
+          pointBorderColor: cssVar('--surface'), pointBorderWidth: 2,
+          tension: 0.3, pointRadius: 5, borderWidth: 2.5, yAxisID: 'y1' }
+      ]},
+      options: baseChartOptions('Ounces', 'Feeds')
+    });
+
+    destroyChart('chartMed');
+    var medInfo = medNameSeries(rangeDays);
+    var medColors = [cssVar('--chart-feed'), cssVar('--chart-diaper'), cssVar('--chart-sleep'), cssVar('--chart-med')];
+    var medDatasets = medInfo.top.map(function(name, i){
+      return { label: name, data: rangeDays.map(function(d){ return d.meds.filter(function(m){ return m.name === name; }).length; }),
+        borderColor: medColors[i], backgroundColor: medColors[i], tension: 0.3, pointRadius: 4, borderWidth: 2 };
+    });
+    if(medInfo.hasOther){
+      medDatasets.push({ label: 'Other', data: rangeDays.map(function(d){
+          return d.meds.filter(function(m){ return medInfo.top.indexOf(m.name) === -1; }).length;
+        }), borderColor: cssVar('--text-muted'), backgroundColor: cssVar('--text-muted'), tension: 0.3, pointRadius: 4, borderWidth: 2, borderDash: [4,3] });
+    }
+    chartInstances.chartMed = new Chart(document.getElementById('chartMed'), {
+      type: 'line',
+      data: { labels: labels, datasets: medDatasets },
+      options: baseChartOptions('Doses given')
+    });
+
+    destroyChart('chartStacked');
+    chartInstances.chartStacked = new Chart(document.getElementById('chartStacked'), {
+      type: 'bar',
+      data: { labels: labels, datasets: [
+        { label: 'Feeds', data: rangeDays.map(function(d){ return d.feedCount; }), backgroundColor: cssVar('--chart-feed'), stack: 's' },
+        { label: 'Diapers', data: rangeDays.map(function(d){ return d.diaperCount; }), backgroundColor: cssVar('--chart-diaper'), stack: 's' },
+        { label: 'Sleep sessions', data: rangeDays.map(function(d){ return d.sleepCount; }), backgroundColor: cssVar('--chart-sleep'), stack: 's' },
+        { label: 'Meds', data: rangeDays.map(function(d){ return d.medCount; }), backgroundColor: cssVar('--chart-med'), stack: 's' }
+      ]},
+      options: (function(){
+        var o = baseChartOptions('Count');
+        o.scales.x.stacked = true;
+        o.scales.y.stacked = true;
+        return o;
+      })()
+    });
+  }
+
+  function tableRow(cells, isEmpty){
+    return '<tr>' + cells.map(function(c, i){ return '<td class="' + (i > 0 && isEmpty ? 'empty-day' : '') + '">' + c + '</td>'; }).join('') + '</tr>';
+  }
+
+  function renderTables(){
+    var rangeDays = buildRangeData();
+
+    var feedHtml = '<thead><tr><th>Date</th><th>Feeds</th><th>Breastfeeding</th><th>Bottle</th></tr></thead><tbody>';
+    rangeDays.forEach(function(d){
+      feedHtml += tableRow([formatAxisLabel(d.date), d.feedCount, d.breastMin ? formatDurationMin(d.breastMin) : '—', d.bottleOz ? d.bottleOz + ' oz' : '—'], d.feedCount === 0);
+    });
+    document.getElementById('tableFeed').innerHTML = feedHtml + '</tbody>';
+
+    var sleepHtml = '<thead><tr><th>Date</th><th>Sessions</th><th>Total sleep</th></tr></thead><tbody>';
+    rangeDays.forEach(function(d){
+      sleepHtml += tableRow([formatAxisLabel(d.date), d.sleepCount, d.sleepMin ? formatDurationMin(d.sleepMin) : '—'], d.sleepCount === 0);
+    });
+    document.getElementById('tableSleep').innerHTML = sleepHtml + '</tbody>';
+
+    var diaperHtml = '<thead><tr><th>Date</th><th>Wet</th><th>Dirty</th><th>Total</th></tr></thead><tbody>';
+    rangeDays.forEach(function(d){
+      diaperHtml += tableRow([formatAxisLabel(d.date), d.wetCount, d.dirtyCount, d.diaperCount], d.diaperCount === 0);
+    });
+    document.getElementById('tableDiaper').innerHTML = diaperHtml + '</tbody>';
+
+    var medHtml = '<thead><tr><th>Date</th><th>Medications given</th></tr></thead><tbody>';
+    rangeDays.forEach(function(d){
+      var list = d.meds.slice().sort(function(a,b){ return a.time < b.time ? -1 : 1; })
+        .map(function(m){ return escapeHtml(m.name) + (m.dose ? ' (' + escapeHtml(m.dose) + ')' : ''); }).join(', ');
+      medHtml += tableRow([formatAxisLabel(d.date), list || '—'], d.medCount === 0);
+    });
+    document.getElementById('tableMed').innerHTML = medHtml + '</tbody>';
+  }
+
+  function renderPrintHeader(){
+    var range = computeHistoryRange();
+    document.getElementById('printHeader').innerHTML =
+      '<div style="margin-bottom:16px;">' +
+        '<div style="font-family:var(--font-display); font-size:22px; font-weight:600;">' + escapeHtml(state.baby.name || 'Baby') + ' — Care History Report</div>' +
+        '<div style="font-size:13px; color:#555; margin-top:4px;">' + formatAxisLabel(range.start) + ' – ' + formatAxisLabel(range.end) + ' · Generated ' + formatAxisLabel(todayStr()) + '</div>' +
+      '</div>';
+  }
+
+  function renderHistory(){
+    renderPrintHeader();
+    renderCharts();
+    renderTables();
+  }
+
+  document.querySelectorAll('#rangePills .pill').forEach(function(p){
+    p.addEventListener('click', function(){
+      document.querySelectorAll('#rangePills .pill').forEach(function(x){ x.classList.remove('active'); });
+      p.classList.add('active');
+      historyRangeMode = p.getAttribute('data-range');
+      var customRow = document.getElementById('customRangeRow');
+      if(historyRangeMode === 'custom'){
+        customRow.style.display = 'flex';
+        var fromEl = document.getElementById('rangeFrom'), toEl = document.getElementById('rangeTo');
+        if(!fromEl.value) fromEl.value = addDays(todayStr(), -6);
+        if(!toEl.value) toEl.value = todayStr();
+        historyRangeCustom.from = fromEl.value; historyRangeCustom.to = toEl.value;
+      } else {
+        customRow.style.display = 'none';
+      }
+      renderHistory();
+    });
+  });
+  document.getElementById('rangeFrom').addEventListener('change', function(){ historyRangeCustom.from = this.value; renderHistory(); });
+  document.getElementById('rangeTo').addEventListener('change', function(){ historyRangeCustom.to = this.value; renderHistory(); });
+  document.getElementById('printBtn').addEventListener('click', function(){ window.print(); });
 
   // ---------------- Boot ----------------
   applyTheme();
