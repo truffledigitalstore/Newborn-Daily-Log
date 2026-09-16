@@ -9,50 +9,52 @@
 <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;0,700;1,500&family=Karla:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#F6F1E7;
-    --surface:#FFFDF9;
-    --surface-2:#EFE7D8;
-    --text:#2B2620;
-    --text-muted:#8C8275;
-    --border:#E4DAC7;
-    --shadow: 0 1px 3px rgba(60,40,20,0.10);
+    --bg:#FAF7F5;
+    --surface:#FFFFFF;
+    --surface-2:#F4EEF3;
+    --text:#332C38;
+    --text-muted:#8D8393;
+    --border:#EAE1E8;
+    --shadow: 0 1px 3px rgba(60,40,60,0.08);
     --radius: 18px;
     --radius-sm: 12px;
 
-    --feed-bg:#E7EFE3;    --feed-text:#3C5A3F;    --feed-accent:#7C9A82;
-    --sleep-bg:#ECE6F6;   --sleep-text:#4A3F6B;   --sleep-accent:#8C7BB5;
-    --diaper-bg:#F7EAD6;  --diaper-text:#7A5A28;  --diaper-accent:#C99A5B;
+    --feed-bg:#DCEFEA;    --feed-text:#2C6A5E;    --feed-accent:#63B4A0;
+    --diaper-bg:#FBF0C9;  --diaper-text:#7A6A1E;  --diaper-accent:#DFBE42;
+    --sleep-bg:#E7E0F5;   --sleep-text:#4E3F7A;   --sleep-accent:#9E88D6;
+    --med-bg:#FCE1EA;     --med-text:#8A3F5A;     --med-accent:#E894B0;
 
-    --hero-grad: linear-gradient(135deg, #7C9A82, #4F7358);
-    --hero-text: #F7F4EC;
+    --hero-grad: linear-gradient(135deg, #E894B4, #9C86D4);
+    --hero-text: #FFFBFD;
 
-    --danger:#B85C4E;
-    --backdrop: rgba(40,30,15,0.32);
+    --danger:#C15C6C;
+    --backdrop: rgba(50,35,50,0.32);
 
     --font-display: "Lora", Georgia, "Times New Roman", serif;
     --font-body: "Karla", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    --brand-accent: #6E8F72;
+    --brand-accent: #D9799E;
   }
 
   :root[data-theme="dark"]{
-    --bg:#18140F;
-    --surface:#221C16;
-    --surface-2:#2B241C;
-    --text:#EFE7DA;
-    --text-muted:#A99C8B;
-    --border:#382F25;
+    --bg:#1B1620;
+    --surface:#241E2A;
+    --surface-2:#2D2635;
+    --text:#EDE7F0;
+    --text-muted:#A79AB0;
+    --border:#3A3142;
     --shadow: 0 1px 3px rgba(0,0,0,0.45);
 
-    --feed-bg:#233024;    --feed-text:#B6D1BB;    --feed-accent:#6E9276;
-    --sleep-bg:#2A2536;   --sleep-text:#C9BEE0;   --sleep-accent:#7C6CA0;
-    --diaper-bg:#3A2C18;  --diaper-text:#E3C793;  --diaper-accent:#B3874D;
+    --feed-bg:#1E332E;    --feed-text:#A9D9C9;    --feed-accent:#4F9482;
+    --diaper-bg:#34301A;  --diaper-text:#E3D48F;  --diaper-accent:#B79F3F;
+    --sleep-bg:#2A2440;   --sleep-text:#C9BEEA;   --sleep-accent:#8A76C4;
+    --med-bg:#3A2430;     --med-text:#E8AEC4;     --med-accent:#C15D82;
 
-    --hero-grad: linear-gradient(135deg, #3E5A44, #263C2B);
-    --hero-text: #EFE9DC;
+    --hero-grad: linear-gradient(135deg, #6B3E56, #4A3E74);
+    --hero-text: #F3E9EF;
 
-    --danger:#C97A6C;
+    --danger:#C97A8A;
     --backdrop: rgba(0,0,0,0.6);
-    --brand-accent: #8FAE93;
+    --brand-accent: #E39FBC;
   }
 
   *{ box-sizing: border-box; }
@@ -152,6 +154,7 @@
   .dot.sleep{ background: var(--sleep-accent); }
   .dot.feed{ background: var(--feed-accent); }
   .dot.diaper{ background: var(--diaper-accent); }
+  .dot.medication{ background: var(--med-accent); }
 
   .add-btn{
     border:1px solid transparent; border-radius: 999px;
@@ -163,6 +166,7 @@
   .add-btn.sleep{ background: var(--sleep-bg); color: var(--sleep-text); border-color: var(--sleep-accent); }
   .add-btn.feed{ background: var(--feed-bg); color: var(--feed-text); border-color: var(--feed-accent); }
   .add-btn.diaper{ background: var(--diaper-bg); color: var(--diaper-text); border-color: var(--diaper-accent); }
+  .add-btn.medication{ background: var(--med-bg); color: var(--med-text); border-color: var(--med-accent); }
   .add-row{ display:flex; gap:8px; flex-wrap:wrap; }
 
   .empty-state{ text-align:center; color: var(--text-muted); font-size:14px; padding: 22px 8px; }
@@ -186,7 +190,7 @@
   .stat-card.feed{ background: var(--feed-bg); color: var(--feed-text); }
   .stat-card.diaper{ background: var(--diaper-bg); color: var(--diaper-text); }
   .stat-card.sleep{ background: var(--sleep-bg); color: var(--sleep-text); }
-  .stat-card.neutral{ background: var(--surface); border:1px solid var(--border); color: var(--text); }
+  .stat-card.medication{ background: var(--med-bg); color: var(--med-text); }
   .stat-label{ font-size:10.5px; font-weight:700; letter-spacing:0.07em; text-transform:uppercase; opacity:0.8; }
   .stat-value{ font-family: var(--font-body); font-size:26px; font-weight:800; font-variant-numeric: tabular-nums; letter-spacing:-0.01em; }
   .stat-caption{ font-size:12px; opacity:0.85; }
@@ -206,7 +210,7 @@
   .icon-svg.lg{ width:26px; height:26px; }
 
   /* ---------- Quick log tiles ---------- */
-  .quick-grid{ display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; }
+  .quick-grid{ display:grid; grid-template-columns: repeat(4, 1fr); gap:8px; }
   .quick-tile{
     border:1px solid var(--border); border-radius: var(--radius-sm);
     background: var(--surface-2);
@@ -219,6 +223,7 @@
   .quick-tile[data-quick="feeding"] .icon-svg{ color: var(--feed-accent); }
   .quick-tile[data-quick="diaper"] .icon-svg{ color: var(--diaper-accent); }
   .quick-tile[data-quick="sleep"] .icon-svg{ color: var(--sleep-accent); }
+  .quick-tile[data-quick="medication"] .icon-svg{ color: var(--med-accent); }
 
   .sleeping-now-card{
     background: var(--sleep-bg); color: var(--sleep-text);
@@ -252,6 +257,7 @@
   .entry-badge.feeding{ background: var(--feed-accent); color: #fff; }
   .entry-badge.diaper{ background: var(--diaper-accent); color: #fff; }
   .entry-badge.sleep{ background: var(--sleep-accent); color: #fff; }
+  .entry-badge.medication{ background: var(--med-accent); color: #fff; }
   .entry-main{ flex:1; min-width:0; }
   .entry-title{ font-weight:700; font-size:14px; }
   .entry-sub{ font-size:12px; color:var(--text-muted); margin-top:2px; }
@@ -431,6 +437,7 @@
             <button class="quick-tile" data-quick="feeding"><svg class="icon-svg lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3C12 3 6 10.5 6 15a6 6 0 0012 0c0-4.5-6-12-6-12z"/></svg>Feed</button>
             <button class="quick-tile" data-quick="diaper"><svg class="icon-svg lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h16"/><path d="M4 9c0 6 3 10 8 10s8-4 8-10"/><path d="M4 9c-1.6 0-2.2 1.6-1 3.2"/><path d="M20 9c1.6 0 2.2 1.6 1 3.2"/></svg>Diaper</button>
             <button class="quick-tile" data-quick="sleep"><svg class="icon-svg lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8.5 8.5 0 119.5 4a7 7 0 1010.5 10.5z"/></svg>Sleep</button>
+            <button class="quick-tile" data-quick="medication"><svg class="icon-svg lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="9.5" width="19" height="5" rx="2.5" transform="rotate(45 12 12)"/><line x1="9.5" y1="14.5" x2="14.5" y2="9.5"/></svg>Meds</button>
           </div>
         </div>
 
@@ -455,6 +462,7 @@
           <button class="add-btn feed" data-add="feeding"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3C12 3 6 10.5 6 15a6 6 0 0012 0c0-4.5-6-12-6-12z"/></svg> Feed</button>
           <button class="add-btn diaper" data-add="diaper"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h16"/><path d="M4 9c0 6 3 10 8 10s8-4 8-10"/><path d="M4 9c-1.6 0-2.2 1.6-1 3.2"/><path d="M20 9c1.6 0 2.2 1.6 1 3.2"/></svg> Diaper</button>
           <button class="add-btn sleep" data-add="sleep"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8.5 8.5 0 119.5 4a7 7 0 1010.5 10.5z"/></svg> Sleep</button>
+          <button class="add-btn medication" data-add="medication"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="9.5" width="19" height="5" rx="2.5" transform="rotate(45 12 12)"/><line x1="9.5" y1="14.5" x2="14.5" y2="9.5"/></svg> Meds</button>
         </div>
 
         <div class="pill-row" id="filterPills">
@@ -462,6 +470,7 @@
           <button class="pill" data-filter="feeding">Feeds</button>
           <button class="pill" data-filter="diaper">Diapers</button>
           <button class="pill" data-filter="sleep">Sleep</button>
+          <button class="pill" data-filter="medication">Meds</button>
         </div>
 
         <div class="entry-list" id="fullLogList"></div>
@@ -532,7 +541,8 @@
       settings: { theme: 'system', caregiverName: '' },
       sleepEntries: [],
       feedingEntries: [],
-      diaperEntries: []
+      diaperEntries: [],
+      medicationEntries: []
     };
   }
 
@@ -541,6 +551,7 @@
     if(!Array.isArray(s.sleepEntries)) s.sleepEntries = [];
     if(!Array.isArray(s.feedingEntries)) s.feedingEntries = [];
     if(!Array.isArray(s.diaperEntries)) s.diaperEntries = [];
+    if(!Array.isArray(s.medicationEntries)) s.medicationEntries = [];
     if(!s.baby) s.baby = { id:'baby-1', name:'', birthDate:null };
     if(!s.settings) s.settings = { theme:'system', caregiverName:'' };
     return s;
@@ -796,6 +807,13 @@
       html += '</div>';
       html += '<div class="field-row"><label>Time</label><input type="time" id="f_time" value="' + time2 + '"></div>';
       html += '<div class="field-row"><label>Notes (optional)</label><textarea id="f_notes">' + (entry && entry.notes ? escapeHtml(entry.notes) : '') + '</textarea></div>';
+    } else if(type === 'medication'){
+      var medTime = entry ? extractTime(entry.time) : nowTimeStr();
+      html += '<div class="modal-title">' + (isEdit ? 'Edit Medication' : 'Add Medication') + '</div>';
+      html += '<div class="field-row"><label>Name</label><input type="text" id="f_name" placeholder="e.g. Vitamin D drops" value="' + (entry && entry.name ? escapeHtml(entry.name) : '') + '"></div>';
+      html += '<div class="field-row"><label>Dose (optional)</label><input type="text" id="f_dose" placeholder="e.g. 400 IU" value="' + (entry && entry.dose ? escapeHtml(entry.dose) : '') + '"></div>';
+      html += '<div class="field-row"><label>Time</label><input type="time" id="f_time" value="' + medTime + '"></div>';
+      html += '<div class="field-row"><label>Notes (optional)</label><textarea id="f_notes">' + (entry && entry.notes ? escapeHtml(entry.notes) : '') + '</textarea></div>';
     }
 
     html += '<div class="modal-actions">';
@@ -899,19 +917,31 @@
       var notes3 = document.getElementById('f_notes').value;
       if(existing){ existing.time = timeIso2; existing.wet = wet; existing.dirty = dirty; existing.notes = notes3; }
       else{ state.diaperEntries.push({ id: uuid(), babyId: state.baby.id, date: dateStr, time: timeIso2, wet: wet, dirty: dirty, notes: notes3 }); }
+    } else if(type === 'medication'){
+      var medName = document.getElementById('f_name').value.trim();
+      var medDose = document.getElementById('f_dose').value.trim();
+      var medTimeVal = document.getElementById('f_time').value;
+      var medNotes = document.getElementById('f_notes').value;
+      if(!medName){ showToast('Medication name is required'); return; }
+      if(!medTimeVal){ showToast('Time is required'); return; }
+      var medTimeIso = combineDateTime(dateStr, medTimeVal);
+      if(existing){ existing.name = medName; existing.dose = medDose; existing.time = medTimeIso; existing.notes = medNotes; }
+      else{ state.medicationEntries.push({ id: uuid(), babyId: state.baby.id, date: dateStr, time: medTimeIso, name: medName, dose: medDose, notes: medNotes }); }
     }
     flushSave(); closeModal(); renderAll();
     showToast(existing ? 'Saved' : 'Added');
   }
 
+  var ARR_NAME_BY_TYPE = { sleep: 'sleepEntries', feeding: 'feedingEntries', diaper: 'diaperEntries', medication: 'medicationEntries' };
+
   function deleteEntry(type, id){
-    var arrName = type === 'sleep' ? 'sleepEntries' : (type === 'feeding' ? 'feedingEntries' : 'diaperEntries');
+    var arrName = ARR_NAME_BY_TYPE[type];
     state[arrName] = state[arrName].filter(function(e){ return e.id !== id; });
     flushSave();
   }
 
   function getEntriesForDate(type, dateStr){
-    var arr = type === 'sleep' ? state.sleepEntries : (type === 'feeding' ? state.feedingEntries : state.diaperEntries);
+    var arr = state[ARR_NAME_BY_TYPE[type]];
     return arr.filter(function(e){ return e.date === dateStr; });
   }
 
@@ -929,6 +959,7 @@
     getEntriesForDate('feeding', dateStr).forEach(function(e){ list.push({ type:'feeding', sortKey: e.time, entry: e }); });
     getEntriesForDate('diaper', dateStr).forEach(function(e){ list.push({ type:'diaper', sortKey: e.time, entry: e }); });
     getEntriesForDate('sleep', dateStr).forEach(function(e){ list.push({ type:'sleep', sortKey: e.start, entry: e }); });
+    getEntriesForDate('medication', dateStr).forEach(function(e){ list.push({ type:'medication', sortKey: e.time, entry: e }); });
     list.sort(function(a,b){ return a.sortKey < b.sortKey ? 1 : (a.sortKey > b.sortKey ? -1 : 0); }); // descending
     return list;
   }
@@ -936,6 +967,7 @@
   var ICON_FEED = '<svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3C12 3 6 10.5 6 15a6 6 0 0012 0c0-4.5-6-12-6-12z"/></svg>';
   var ICON_DIAPER = '<svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h16"/><path d="M4 9c0 6 3 10 8 10s8-4 8-10"/><path d="M4 9c-1.6 0-2.2 1.6-1 3.2"/><path d="M20 9c1.6 0 2.2 1.6 1 3.2"/></svg>';
   var ICON_SLEEP = '<svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8.5 8.5 0 119.5 4a7 7 0 1010.5 10.5z"/></svg>';
+  var ICON_MED = '<svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="9.5" width="19" height="5" rx="2.5" transform="rotate(45 12 12)"/><line x1="9.5" y1="14.5" x2="14.5" y2="9.5"/></svg>';
 
   function entryTitleAndSub(type, entry){
     if(type === 'feeding'){
@@ -953,6 +985,10 @@
     if(type === 'diaper'){
       var title2 = (entry.wet && entry.dirty) ? 'Both diaper' : (entry.wet ? 'Wet diaper' : (entry.dirty ? 'Dirty diaper' : 'Diaper change'));
       return { icon: ICON_DIAPER, title: title2, sub: entry.notes || '' };
+    }
+    if(type === 'medication'){
+      var title3 = entry.name + (entry.dose ? ' · ' + entry.dose : '');
+      return { icon: ICON_MED, title: title3, sub: entry.notes || '' };
     }
     // sleep
     var label = sleepLabel(entry.start);
@@ -1048,18 +1084,20 @@
     var totalSleepMin = sleeps.reduce(function(sum, e){ return e.end ? sum + minutesBetween(e.start, e.end) : sum; }, 0);
     var feeds = getEntriesForDate('feeding', selectedDate);
     var diapers = getEntriesForDate('diaper', selectedDate);
+    var meds = getEntriesForDate('medication', selectedDate);
     var wetCount = diapers.filter(function(d){ return d.wet; }).length;
     var dirtyCount = diapers.filter(function(d){ return d.dirty; }).length;
     var totalOz = feeds.filter(function(f){ return f.method === 'bottle' && f.bottleOz; }).reduce(function(s,f){ return s + f.bottleOz; }, 0);
     var totalBreastMin = feeds.filter(function(f){ return f.method === 'breast' && f.durationMin; }).reduce(function(s,f){ return s + f.durationMin; }, 0);
-    var lastFeed = feeds.length ? formatTime12(extractTime(feeds.slice().sort(function(a,b){ return a.time < b.time ? 1 : -1; })[0].time)) : null;
+    var feedCaption = (totalOz || totalBreastMin) ? (totalOz + 'oz · ' + totalBreastMin + 'm breast') : 'none yet';
+    var lastMed = meds.length ? meds.slice().sort(function(a,b){ return a.time < b.time ? 1 : -1; })[0].name : null;
 
     var grid = document.getElementById('statGrid');
     grid.innerHTML =
-      '<div class="stat-card feed"><div class="stat-label">Feeds</div><div class="stat-value">' + feeds.length + '</div><div class="stat-caption">' + (lastFeed ? 'last ' + lastFeed : 'none yet') + '</div></div>' +
+      '<div class="stat-card feed"><div class="stat-label">Feeds</div><div class="stat-value">' + feeds.length + '</div><div class="stat-caption">' + feedCaption + '</div></div>' +
       '<div class="stat-card diaper"><div class="stat-label">Diapers</div><div class="stat-value">' + diapers.length + '</div><div class="stat-caption">' + wetCount + ' wet · ' + dirtyCount + ' dirty</div></div>' +
       '<div class="stat-card sleep"><div class="stat-label">Sleep</div><div class="stat-value">' + formatDurationMin(totalSleepMin || 0) + '</div><div class="stat-caption">' + sleeps.length + ' session' + (sleeps.length === 1 ? '' : 's') + '</div></div>' +
-      '<div class="stat-card neutral"><div class="stat-label">Feeding volume</div><div class="stat-value">' + (totalOz || 0) + ' oz</div><div class="stat-caption">' + (totalBreastMin || 0) + ' min breast</div></div>';
+      '<div class="stat-card medication"><div class="stat-label">Meds</div><div class="stat-value">' + meds.length + '</div><div class="stat-caption">' + (lastMed ? 'last ' + escapeHtml(lastMed) : 'none yet') + '</div></div>';
   }
 
   function renderHeaderLabels(){
@@ -1147,13 +1185,14 @@
         state = incoming; flushSave(); applyTheme(); renderAll();
         showToast('Restored (replaced all data)');
       } else if(choice === 'merge'){
-        var countBefore = state.sleepEntries.length + state.feedingEntries.length + state.diaperEntries.length;
+        var countBefore = state.sleepEntries.length + state.feedingEntries.length + state.diaperEntries.length + state.medicationEntries.length;
         state.sleepEntries = mergeById(state.sleepEntries, incoming.sleepEntries);
         state.feedingEntries = mergeById(state.feedingEntries, incoming.feedingEntries);
         state.diaperEntries = mergeById(state.diaperEntries, incoming.diaperEntries);
+        state.medicationEntries = mergeById(state.medicationEntries, incoming.medicationEntries);
         if(!state.baby.name && incoming.baby && incoming.baby.name) state.baby.name = incoming.baby.name;
         flushSave(); renderAll();
-        var countAfter = state.sleepEntries.length + state.feedingEntries.length + state.diaperEntries.length;
+        var countAfter = state.sleepEntries.length + state.feedingEntries.length + state.diaperEntries.length + state.medicationEntries.length;
         showToast('Merged. ' + (countAfter - countBefore) + ' new entries added.');
       } else { showToast('Restore cancelled'); }
       e.target.value = '';
