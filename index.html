@@ -36,10 +36,10 @@
     --brand-accent: #D9799E;
 
     /* Chart marks: deeper/more saturated than the pastel UI tints above (validated for CVD-safe categorical use) */
-    --chart-feed:#2F9C82;
+    --chart-feed:#2F9C82;     --chart-feed-line:#C2703A;
     --chart-diaper:#C99A2E;   --chart-diaper-dirty:#3D63A8;
-    --chart-sleep:#7859C9;
-    --chart-med:#D6487C;
+    --chart-sleep:#7859C9;    --chart-sleep-line:#D6487C;
+    --chart-med:#D6487C;      --chart-med-2:#4A5FA8;
     --chart-grid: rgba(51,44,56,0.08);
   }
 
@@ -64,10 +64,10 @@
     --backdrop: rgba(0,0,0,0.6);
     --brand-accent: #E39FBC;
 
-    --chart-feed:#3FA98F;
+    --chart-feed:#3FA98F;     --chart-feed-line:#B86F44;
     --chart-diaper:#A8862E;   --chart-diaper-dirty:#4C74BE;
-    --chart-sleep:#8B76C9;
-    --chart-med:#D6608C;
+    --chart-sleep:#8B76C9;    --chart-sleep-line:#D6608C;
+    --chart-med:#D6608C;      --chart-med-2:#6478C0;
     --chart-grid: rgba(237,231,240,0.10);
   }
 
@@ -286,7 +286,7 @@
     border:1px solid var(--border); background: var(--surface-2); color: var(--text);
     font-size:12.5px; font-weight:700;
   }
-  .pill.active{ background: var(--text); color: var(--bg); border-color: transparent; }
+  .pill.active{ background: var(--med-bg); color: var(--med-text); border-color: var(--med-accent); font-weight:800; }
 
   /* Mobile bottom nav */
   #mobileTabBar{
@@ -337,7 +337,7 @@
     font-weight:700; font-size:13px;
   }
   .seg button.active{ background: var(--feed-accent); color:#fff; border-color: transparent; }
-  #themeSeg button.active{ background: var(--text); color: var(--bg); border-color: transparent; }
+  #themeSeg button.active{ background: var(--med-bg); color: var(--med-text); border-color: var(--med-accent); }
   .toggle-row{ display:flex; gap:10px; }
   .toggle-btn{
     flex:1; padding:16px 6px; border-radius: var(--radius-sm);
@@ -351,6 +351,7 @@
   .modal-actions{ display:flex; gap:10px; margin-top:4px; }
   .btn{ flex:1; padding:12px; border-radius: var(--radius-sm); border:none; font-weight:700; font-size:14px; }
   .btn.primary{ background: var(--text); color: var(--bg); }
+  .btn.soft-med{ background: var(--med-bg); color: var(--med-text); border:1px solid var(--med-accent); }
   .btn.ghost{ background: var(--surface-2); color: var(--text); border:1px solid var(--border); }
   .btn.danger{ background: var(--danger); color:#fff; }
 
@@ -542,7 +543,7 @@
             <div class="field-row"><label>From</label><input type="date" id="rangeFrom"></div>
             <div class="field-row"><label>To</label><input type="date" id="rangeTo"></div>
           </div>
-          <button class="btn primary" id="printBtn" style="margin-top:12px;">🖨 Print / Save PDF</button>
+          <button class="btn soft-med" id="printBtn" style="margin-top:12px;">🖨 Print / Save PDF</button>
         </div>
 
         <div class="card">
@@ -885,6 +886,7 @@
       html += '<div class="field-row"><label>Start</label><input type="time" id="f_start" value="' + startTime + '"></div>';
       html += '<div class="field-row"><label>End</label><input type="time" id="f_end" value="' + endTime + '"><div class="muted-small" style="text-transform:none; letter-spacing:normal; font-weight:600; margin-top:4px;">Leave empty if still sleeping.</div></div>';
       html += '</div>';
+      html += '<div class="field-row"><label>Or, duration in minutes</label><input type="number" id="f_durFallback" min="0" step="1" placeholder="e.g. 45 — if you forgot to note the end time"></div>';
       html += '<div class="field-row"><label>Notes (optional)</label><textarea id="f_notes">' + (entry && entry.notes ? escapeHtml(entry.notes) : '') + '</textarea></div>';
     } else if(type === 'feeding'){
       var method = entry ? entry.method : 'breast';
@@ -911,6 +913,7 @@
       html += '<div class="field-row"><label>Start</label><input type="time" id="f_start" value="' + breastStart + '"></div>';
       html += '<div class="field-row"><label>End</label><input type="time" id="f_end" value="' + breastEnd + '"><div class="muted-small" style="text-transform:none; letter-spacing:normal; font-weight:600; margin-top:4px;">Leave empty if still feeding.</div></div>';
       html += '</div>';
+      html += '<div class="field-row" style="margin-top:8px;"><label>Or, duration in minutes</label><input type="number" id="f_durFallback" min="0" step="1" placeholder="e.g. 15 — if you forgot to note the end time"></div>';
       html += '</div>';
 
       html += '<div id="feedFieldsTime" class="field-row" style="' + (method !== 'breast' ? '' : 'display:none;') + '">';
@@ -997,6 +1000,22 @@
     });
   }
 
+  function computeEndIso(startIso, endTimeVal, startTimeVal, dateStr){
+    if(endTimeVal){
+      var endIso = combineDateTime(dateStr, endTimeVal);
+      if(endTimeVal < startTimeVal){ endIso = combineDateTime(addDays(dateStr, 1), endTimeVal); }
+      return endIso;
+    }
+    var durEl = document.getElementById('f_durFallback');
+    var durVal = durEl ? durEl.value : '';
+    if(durVal && Number(durVal) > 0){
+      var start = new Date(startIso.replace(' ', 'T'));
+      start.setMinutes(start.getMinutes() + Number(durVal));
+      return toDateStr(start) + 'T' + pad(start.getHours()) + ':' + pad(start.getMinutes()) + ':00';
+    }
+    return null;
+  }
+
   function saveEntryFromModal(type, existing, dateStr){
     if(type === 'sleep'){
       var startTime = document.getElementById('f_start').value;
@@ -1004,11 +1023,7 @@
       var notes = document.getElementById('f_notes').value;
       if(!startTime){ showToast('Start time is required'); return; }
       var startIso = combineDateTime(dateStr, startTime);
-      var endIso = null;
-      if(endTime){
-        endIso = combineDateTime(dateStr, endTime);
-        if(endTime < startTime){ endIso = combineDateTime(addDays(dateStr, 1), endTime); }
-      }
+      var endIso = computeEndIso(startIso, endTime, startTime, dateStr);
       if(existing){ existing.start = startIso; existing.end = endIso; existing.notes = notes; }
       else{ state.sleepEntries.push({ id: uuid(), babyId: state.baby.id, date: dateStr, start: startIso, end: endIso, notes: notes }); }
     } else if(type === 'feeding'){
@@ -1024,10 +1039,7 @@
         var bEnd = document.getElementById('f_end').value;
         if(!bStart){ showToast('Start time is required'); return; }
         startIso2 = combineDateTime(dateStr, bStart);
-        if(bEnd){
-          endIso2 = combineDateTime(dateStr, bEnd);
-          if(bEnd < bStart){ endIso2 = combineDateTime(addDays(dateStr, 1), bEnd); }
-        }
+        endIso2 = computeEndIso(startIso2, bEnd, bStart, dateStr);
       } else {
         var fTime = document.getElementById('f_time').value;
         if(!fTime){ showToast('Time is required'); return; }
@@ -1065,6 +1077,10 @@
       var medTimeIso = combineDateTime(dateStr, medTimeVal);
       if(existing){ existing.name = medName; existing.dose = medDose; existing.time = medTimeIso; existing.notes = medNotes; }
       else{ state.medicationEntries.push({ id: uuid(), babyId: state.baby.id, date: dateStr, time: medTimeIso, name: medName, dose: medDose, notes: medNotes }); }
+    }
+    if(!existing){
+      activeFilter = 'all';
+      document.querySelectorAll('#filterPills .pill').forEach(function(p){ p.classList.toggle('active', p.getAttribute('data-filter') === 'all'); });
     }
     flushSave(); closeModal(); renderAll();
     showToast(existing ? 'Saved' : 'Added');
@@ -1426,13 +1442,24 @@
     return dateRangeArray(range.start, range.end).map(aggregateDay);
   }
 
+  function normalizeMedName(name){
+    return String(name || '').trim().replace(/\s*\([^)]*\)\s*$/, '').trim().toLowerCase().replace(/\s+/g, ' ');
+  }
+  function titleCaseMed(s){
+    return s.replace(/\S+/g, function(w){ return w.charAt(0).toUpperCase() + w.slice(1); });
+  }
   function medNameSeries(rangeDays){
-    var counts = {};
+    var counts = {}, display = {};
     rangeDays.forEach(function(d){
-      d.meds.forEach(function(m){ counts[m.name] = (counts[m.name] || 0) + 1; });
+      d.meds.forEach(function(m){
+        var key = normalizeMedName(m.name);
+        if(!key) return;
+        counts[key] = (counts[key] || 0) + 1;
+        if(!display[key]) display[key] = titleCaseMed(key);
+      });
     });
-    var names = Object.keys(counts).sort(function(a,b){ return counts[b] - counts[a]; });
-    return { top: names.slice(0, 4), hasOther: names.length > 4 };
+    var keys = Object.keys(counts).sort(function(a,b){ return counts[b] - counts[a]; });
+    return { top: keys.slice(0, 2), hasOther: keys.length > 2, display: display };
   }
 
   function destroyChart(id){
@@ -1460,22 +1487,49 @@
     return opts;
   }
 
+  // Combo bar+line charts: keep the bar confined to the lower portion of the chart and the
+  // line confined to a slim band near the top, so a tall bar never visually overlaps the line
+  // regardless of the actual data values.
+  function comboChartOptions(barData, lineData, yTitle, y1Title){
+    var barMax = Math.max.apply(null, barData.concat([1]));
+    var lineMax = Math.max.apply(null, lineData.concat([1]));
+    return {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: true, position: 'bottom', labels: { usePointStyle: true, boxWidth: 8, color: cssVar('--text') } },
+        tooltip: { enabled: true }
+      },
+      scales: {
+        x: { grid: { display: false }, ticks: { color: cssVar('--text-muted') } },
+        y: { beginAtZero: true, max: barMax * 1.6, grid: { color: cssVar('--chart-grid') }, ticks: { color: cssVar('--text-muted'), precision: 0 },
+             title: { display: !!yTitle, text: yTitle, color: cssVar('--text-muted') } },
+        y1: { position: 'right', min: -2 * lineMax, max: 1.2 * lineMax, grid: { drawOnChartArea: false },
+              ticks: { color: cssVar('--text-muted'), precision: 0, callback: function(v){ return v < 0 ? '' : v; } },
+              afterBuildTicks: function(axis){ axis.ticks = axis.ticks.filter(function(t){ return t.value >= 0; }); },
+              title: { display: true, text: y1Title, color: cssVar('--text-muted') } }
+      }
+    };
+  }
+
   function renderCharts(){
     if(typeof Chart === 'undefined') return;
     var rangeDays = buildRangeData();
     var labels = rangeDays.map(function(d){ return formatAxisLabel(d.date); });
 
     destroyChart('chartSleep');
+    var sleepHoursData = rangeDays.map(function(d){ return +(d.sleepMin/60).toFixed(2); });
+    var sleepSessionsData = rangeDays.map(function(d){ return d.sleepCount; });
     chartInstances.chartSleep = new Chart(document.getElementById('chartSleep'), {
       data: { labels: labels, datasets: [
-        { type: 'bar', label: 'Sleep (hours)', data: rangeDays.map(function(d){ return +(d.sleepMin/60).toFixed(2); }),
+        { type: 'bar', label: 'Sleep (hours)', data: sleepHoursData,
           backgroundColor: cssVar('--chart-sleep'), borderRadius: 4, yAxisID: 'y' },
-        { type: 'line', label: 'Sessions', data: rangeDays.map(function(d){ return d.sleepCount; }),
-          borderColor: cssVar('--chart-med'), backgroundColor: cssVar('--chart-med'),
+        { type: 'line', label: 'Sessions', data: sleepSessionsData,
+          borderColor: cssVar('--chart-sleep-line'), backgroundColor: cssVar('--chart-sleep-line'),
           pointBorderColor: cssVar('--surface'), pointBorderWidth: 2,
           tension: 0.3, pointRadius: 5, borderWidth: 2.5, yAxisID: 'y1' }
       ]},
-      options: baseChartOptions('Hours', 'Sessions')
+      options: comboChartOptions(sleepHoursData, sleepSessionsData, 'Hours', 'Sessions')
     });
 
     destroyChart('chartDiaper');
@@ -1491,28 +1545,31 @@
     });
 
     destroyChart('chartFeed');
+    var feedOzData = rangeDays.map(function(d){ return d.bottleOz; });
+    var feedCountData = rangeDays.map(function(d){ return d.feedCount; });
     chartInstances.chartFeed = new Chart(document.getElementById('chartFeed'), {
       data: { labels: labels, datasets: [
-        { type: 'bar', label: 'Bottle volume (oz)', data: rangeDays.map(function(d){ return d.bottleOz; }),
+        { type: 'bar', label: 'Bottle volume (oz)', data: feedOzData,
           backgroundColor: cssVar('--chart-feed'), borderRadius: 4, yAxisID: 'y' },
-        { type: 'line', label: 'Feeds', data: rangeDays.map(function(d){ return d.feedCount; }),
-          borderColor: cssVar('--chart-diaper'), backgroundColor: cssVar('--chart-diaper'),
+        { type: 'line', label: 'Feeds', data: feedCountData,
+          borderColor: cssVar('--chart-feed-line'), backgroundColor: cssVar('--chart-feed-line'),
           pointBorderColor: cssVar('--surface'), pointBorderWidth: 2,
           tension: 0.3, pointRadius: 5, borderWidth: 2.5, yAxisID: 'y1' }
       ]},
-      options: baseChartOptions('Ounces', 'Feeds')
+      options: comboChartOptions(feedOzData, feedCountData, 'Ounces', 'Feeds')
     });
 
     destroyChart('chartMed');
     var medInfo = medNameSeries(rangeDays);
-    var medColors = [cssVar('--chart-feed'), cssVar('--chart-diaper'), cssVar('--chart-sleep'), cssVar('--chart-med')];
-    var medDatasets = medInfo.top.map(function(name, i){
-      return { label: name, data: rangeDays.map(function(d){ return d.meds.filter(function(m){ return m.name === name; }).length; }),
-        borderColor: medColors[i], backgroundColor: medColors[i], tension: 0.3, pointRadius: 4, borderWidth: 2 };
+    var medColors = [cssVar('--chart-med'), cssVar('--chart-med-2')];
+    var medDatasets = medInfo.top.map(function(key, i){
+      return { label: medInfo.display[key], data: rangeDays.map(function(d){
+          return d.meds.filter(function(m){ return normalizeMedName(m.name) === key; }).length;
+        }), borderColor: medColors[i], backgroundColor: medColors[i], tension: 0.3, pointRadius: 4, borderWidth: 2 };
     });
     if(medInfo.hasOther){
       medDatasets.push({ label: 'Other', data: rangeDays.map(function(d){
-          return d.meds.filter(function(m){ return medInfo.top.indexOf(m.name) === -1; }).length;
+          return d.meds.filter(function(m){ return medInfo.top.indexOf(normalizeMedName(m.name)) === -1; }).length;
         }), borderColor: cssVar('--text-muted'), backgroundColor: cssVar('--text-muted'), tension: 0.3, pointRadius: 4, borderWidth: 2, borderDash: [4,3] });
     }
     chartInstances.chartMed = new Chart(document.getElementById('chartMed'), {
@@ -1522,6 +1579,8 @@
     });
 
     destroyChart('chartStacked');
+    var stackedWrap = document.getElementById('chartStacked').parentElement;
+    stackedWrap.style.height = Math.max(240, rangeDays.length * 34) + 'px';
     chartInstances.chartStacked = new Chart(document.getElementById('chartStacked'), {
       type: 'bar',
       data: { labels: labels, datasets: [
@@ -1530,12 +1589,20 @@
         { label: 'Sleep sessions', data: rangeDays.map(function(d){ return d.sleepCount; }), backgroundColor: cssVar('--chart-sleep'), stack: 's' },
         { label: 'Meds', data: rangeDays.map(function(d){ return d.medCount; }), backgroundColor: cssVar('--chart-med'), stack: 's' }
       ]},
-      options: (function(){
-        var o = baseChartOptions('Count');
-        o.scales.x.stacked = true;
-        o.scales.y.stacked = true;
-        return o;
-      })()
+      options: {
+        indexAxis: 'y',
+        responsive: true, maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: { display: true, position: 'bottom', labels: { usePointStyle: true, boxWidth: 8, color: cssVar('--text') } },
+          tooltip: { enabled: true }
+        },
+        scales: {
+          x: { stacked: true, beginAtZero: true, grid: { color: cssVar('--chart-grid') }, ticks: { color: cssVar('--text-muted'), precision: 0 },
+               title: { display: true, text: 'Count', color: cssVar('--text-muted') } },
+          y: { stacked: true, grid: { display: false }, ticks: { color: cssVar('--text-muted') } }
+        }
+      }
     });
   }
 
