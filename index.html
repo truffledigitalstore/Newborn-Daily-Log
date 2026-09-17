@@ -1521,9 +1521,9 @@
     var sleepSessionsData = rangeDays.map(function(d){ return d.sleepCount; });
     chartInstances.chartSleep = new Chart(document.getElementById('chartSleep'), {
       data: { labels: labels, datasets: [
-        { type: 'bar', label: 'Sleep (hours)', data: sleepHoursData, order: 1,
+        { type: 'bar', label: 'Sleep (hours)', data: sleepHoursData, order: 2,
           backgroundColor: cssVar('--chart-sleep'), borderRadius: 4, yAxisID: 'y' },
-        { type: 'line', label: 'Sessions', data: sleepSessionsData, order: 2,
+        { type: 'line', label: 'Sessions', data: sleepSessionsData, order: 1,
           borderColor: cssVar('--chart-sleep-line'), backgroundColor: cssVar('--chart-sleep-line'),
           pointBorderColor: cssVar('--surface'), pointBorderWidth: 2,
           tension: 0.3, pointRadius: 5, borderWidth: 2.5, yAxisID: 'y1' }
@@ -1548,9 +1548,9 @@
     var feedCountData = rangeDays.map(function(d){ return d.feedCount; });
     chartInstances.chartFeed = new Chart(document.getElementById('chartFeed'), {
       data: { labels: labels, datasets: [
-        { type: 'bar', label: 'Bottle volume (oz)', data: feedOzData, order: 1,
+        { type: 'bar', label: 'Bottle volume (oz)', data: feedOzData, order: 2,
           backgroundColor: cssVar('--chart-feed'), borderRadius: 4, yAxisID: 'y' },
-        { type: 'line', label: 'Feeds', data: feedCountData, order: 2,
+        { type: 'line', label: 'Feeds', data: feedCountData, order: 1,
           borderColor: cssVar('--chart-feed-line'), backgroundColor: cssVar('--chart-feed-line'),
           pointBorderColor: cssVar('--surface'), pointBorderWidth: 2,
           tension: 0.3, pointRadius: 5, borderWidth: 2.5, yAxisID: 'y1' }
