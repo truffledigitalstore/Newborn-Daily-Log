@@ -1472,7 +1472,7 @@
       interaction: { mode: 'index', intersect: false },
       plugins: {
         legend: { display: true, position: 'bottom', labels: { usePointStyle: true, boxWidth: 8, color: cssVar('--text') } },
-        tooltip: { enabled: true }
+        tooltip: { enabled: true, callbacks: { label: function(ctx){ return ctx.dataset.label + ': ' + Math.round(ctx.parsed.y); } } }
       },
       scales: {
         x: { grid: { display: false }, ticks: { color: cssVar('--text-muted') } },
@@ -1511,6 +1511,17 @@
     };
   }
 
+  // When two lines share the same value on the same day they'd otherwise draw exactly on top
+  // of each other and look like a single line. Nudge each series by a small fixed amount (well
+  // under half a unit, so it never changes which gridline a point reads closest to) purely so
+  // both colors stay visible; tooltips round back to the true integer value via the callback
+  // in baseChartOptions, so nothing inaccurate is ever displayed.
+  var LINE_JITTER = [0, 0.12, -0.12, 0.2, -0.2];
+  function withJitter(dataArr, seriesIndex){
+    var offset = LINE_JITTER[seriesIndex] || 0;
+    return offset ? dataArr.map(function(v){ return v + offset; }) : dataArr;
+  }
+
   function renderCharts(){
     if(typeof Chart === 'undefined') return;
     var rangeDays = buildRangeData();
@@ -1525,8 +1536,7 @@
           backgroundColor: cssVar('--chart-sleep'), borderRadius: 4, yAxisID: 'y' },
         { type: 'line', label: 'Sessions', data: sleepSessionsData, order: 1,
           borderColor: cssVar('--chart-sleep-line'), backgroundColor: cssVar('--chart-sleep-line'),
-          pointBorderColor: cssVar('--surface'), pointBorderWidth: 2,
-          tension: 0.3, pointRadius: 5, borderWidth: 2.5, yAxisID: 'y1' }
+          tension: 0.3, pointRadius: 4, borderWidth: 2, yAxisID: 'y1' }
       ]},
       options: comboChartOptions('Hours', 'Sessions')
     });
@@ -1535,9 +1545,9 @@
     chartInstances.chartDiaper = new Chart(document.getElementById('chartDiaper'), {
       type: 'line',
       data: { labels: labels, datasets: [
-        { label: 'Wet', data: rangeDays.map(function(d){ return d.wetCount; }),
+        { label: 'Wet', data: withJitter(rangeDays.map(function(d){ return d.wetCount; }), 0),
           borderColor: cssVar('--chart-diaper'), backgroundColor: cssVar('--chart-diaper'), tension: 0.3, pointRadius: 4, borderWidth: 2 },
-        { label: 'Dirty', data: rangeDays.map(function(d){ return d.dirtyCount; }),
+        { label: 'Dirty', data: withJitter(rangeDays.map(function(d){ return d.dirtyCount; }), 1),
           borderColor: cssVar('--chart-diaper-dirty'), backgroundColor: cssVar('--chart-diaper-dirty'), tension: 0.3, pointRadius: 4, borderWidth: 2 }
       ]},
       options: baseChartOptions('Count')
@@ -1552,8 +1562,7 @@
           backgroundColor: cssVar('--chart-feed'), borderRadius: 4, yAxisID: 'y' },
         { type: 'line', label: 'Feeds', data: feedCountData, order: 1,
           borderColor: cssVar('--chart-feed-line'), backgroundColor: cssVar('--chart-feed-line'),
-          pointBorderColor: cssVar('--surface'), pointBorderWidth: 2,
-          tension: 0.3, pointRadius: 5, borderWidth: 2.5, yAxisID: 'y1' }
+          tension: 0.3, pointRadius: 4, borderWidth: 2, yAxisID: 'y1' }
       ]},
       options: comboChartOptions('Ounces', 'Feeds')
     });
@@ -1562,14 +1571,14 @@
     var medInfo = medNameSeries(rangeDays);
     var medColors = [cssVar('--chart-med'), cssVar('--chart-med-2'), cssVar('--chart-feed'), cssVar('--chart-diaper')];
     var medDatasets = medInfo.top.map(function(key, i){
-      return { label: medInfo.display[key], data: rangeDays.map(function(d){
-          return d.meds.filter(function(m){ return normalizeMedName(m.name) === key; }).length;
-        }), borderColor: medColors[i], backgroundColor: medColors[i], tension: 0.3, pointRadius: 4, borderWidth: 2 };
+      var raw = rangeDays.map(function(d){ return d.meds.filter(function(m){ return normalizeMedName(m.name) === key; }).length; });
+      return { label: medInfo.display[key], data: withJitter(raw, i),
+        borderColor: medColors[i], backgroundColor: medColors[i], tension: 0.3, pointRadius: 4, borderWidth: 2 };
     });
     if(medInfo.hasOther){
-      medDatasets.push({ label: 'Other', data: rangeDays.map(function(d){
-          return d.meds.filter(function(m){ return medInfo.top.indexOf(normalizeMedName(m.name)) === -1; }).length;
-        }), borderColor: cssVar('--text-muted'), backgroundColor: cssVar('--text-muted'), tension: 0.3, pointRadius: 4, borderWidth: 2, borderDash: [4,3] });
+      var rawOther = rangeDays.map(function(d){ return d.meds.filter(function(m){ return medInfo.top.indexOf(normalizeMedName(m.name)) === -1; }).length; });
+      medDatasets.push({ label: 'Other', data: withJitter(rawOther, medInfo.top.length),
+        borderColor: cssVar('--text-muted'), backgroundColor: cssVar('--text-muted'), tension: 0.3, pointRadius: 4, borderWidth: 2, borderDash: [4,3] });
     }
     chartInstances.chartMed = new Chart(document.getElementById('chartMed'), {
       type: 'line',
