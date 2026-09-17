@@ -1459,7 +1459,7 @@
       });
     });
     var keys = Object.keys(counts).sort(function(a,b){ return counts[b] - counts[a]; });
-    return { top: keys.slice(0, 2), hasOther: keys.length > 2, display: display };
+    return { top: keys.slice(0, 4), hasOther: keys.length > 4, display: display };
   }
 
   function destroyChart(id){
@@ -1490,9 +1490,10 @@
   // Combo bar+line charts: keep the bar confined to the lower portion of the chart and the
   // line confined to a slim band near the top, so a tall bar never visually overlaps the line
   // regardless of the actual data values.
-  function comboChartOptions(barData, lineData, yTitle, y1Title){
-    var barMax = Math.max.apply(null, barData.concat([1]));
-    var lineMax = Math.max.apply(null, lineData.concat([1]));
+  // Combo bar+line charts: bars use their natural full-height scale (can be as tall as the
+  // data needs); the line is drawn with an explicit higher `order` so it always renders in
+  // front of the bars wherever they visually meet, keeping its value readable.
+  function comboChartOptions(yTitle, y1Title){
     return {
       responsive: true, maintainAspectRatio: false,
       interaction: { mode: 'index', intersect: false },
@@ -1502,11 +1503,9 @@
       },
       scales: {
         x: { grid: { display: false }, ticks: { color: cssVar('--text-muted') } },
-        y: { beginAtZero: true, max: barMax * 1.6, grid: { color: cssVar('--chart-grid') }, ticks: { color: cssVar('--text-muted'), precision: 0 },
+        y: { beginAtZero: true, grace: 1, grid: { color: cssVar('--chart-grid') }, ticks: { color: cssVar('--text-muted'), precision: 0 },
              title: { display: !!yTitle, text: yTitle, color: cssVar('--text-muted') } },
-        y1: { position: 'right', min: -2 * lineMax, max: 1.2 * lineMax, grid: { drawOnChartArea: false },
-              ticks: { color: cssVar('--text-muted'), precision: 0, callback: function(v){ return v < 0 ? '' : v; } },
-              afterBuildTicks: function(axis){ axis.ticks = axis.ticks.filter(function(t){ return t.value >= 0; }); },
+        y1: { position: 'right', beginAtZero: true, grace: 1, grid: { drawOnChartArea: false }, ticks: { color: cssVar('--text-muted'), precision: 0 },
               title: { display: true, text: y1Title, color: cssVar('--text-muted') } }
       }
     };
@@ -1522,14 +1521,14 @@
     var sleepSessionsData = rangeDays.map(function(d){ return d.sleepCount; });
     chartInstances.chartSleep = new Chart(document.getElementById('chartSleep'), {
       data: { labels: labels, datasets: [
-        { type: 'bar', label: 'Sleep (hours)', data: sleepHoursData,
+        { type: 'bar', label: 'Sleep (hours)', data: sleepHoursData, order: 1,
           backgroundColor: cssVar('--chart-sleep'), borderRadius: 4, yAxisID: 'y' },
-        { type: 'line', label: 'Sessions', data: sleepSessionsData,
+        { type: 'line', label: 'Sessions', data: sleepSessionsData, order: 2,
           borderColor: cssVar('--chart-sleep-line'), backgroundColor: cssVar('--chart-sleep-line'),
           pointBorderColor: cssVar('--surface'), pointBorderWidth: 2,
           tension: 0.3, pointRadius: 5, borderWidth: 2.5, yAxisID: 'y1' }
       ]},
-      options: comboChartOptions(sleepHoursData, sleepSessionsData, 'Hours', 'Sessions')
+      options: comboChartOptions('Hours', 'Sessions')
     });
 
     destroyChart('chartDiaper');
@@ -1549,19 +1548,19 @@
     var feedCountData = rangeDays.map(function(d){ return d.feedCount; });
     chartInstances.chartFeed = new Chart(document.getElementById('chartFeed'), {
       data: { labels: labels, datasets: [
-        { type: 'bar', label: 'Bottle volume (oz)', data: feedOzData,
+        { type: 'bar', label: 'Bottle volume (oz)', data: feedOzData, order: 1,
           backgroundColor: cssVar('--chart-feed'), borderRadius: 4, yAxisID: 'y' },
-        { type: 'line', label: 'Feeds', data: feedCountData,
+        { type: 'line', label: 'Feeds', data: feedCountData, order: 2,
           borderColor: cssVar('--chart-feed-line'), backgroundColor: cssVar('--chart-feed-line'),
           pointBorderColor: cssVar('--surface'), pointBorderWidth: 2,
           tension: 0.3, pointRadius: 5, borderWidth: 2.5, yAxisID: 'y1' }
       ]},
-      options: comboChartOptions(feedOzData, feedCountData, 'Ounces', 'Feeds')
+      options: comboChartOptions('Ounces', 'Feeds')
     });
 
     destroyChart('chartMed');
     var medInfo = medNameSeries(rangeDays);
-    var medColors = [cssVar('--chart-med'), cssVar('--chart-med-2')];
+    var medColors = [cssVar('--chart-med'), cssVar('--chart-med-2'), cssVar('--chart-feed'), cssVar('--chart-diaper')];
     var medDatasets = medInfo.top.map(function(key, i){
       return { label: medInfo.display[key], data: rangeDays.map(function(d){
           return d.meds.filter(function(m){ return normalizeMedName(m.name) === key; }).length;
@@ -1592,10 +1591,10 @@
       options: {
         indexAxis: 'y',
         responsive: true, maintainAspectRatio: false,
-        interaction: { mode: 'index', intersect: false },
+        interaction: { mode: 'index', intersect: false, axis: 'y' },
         plugins: {
           legend: { display: true, position: 'bottom', labels: { usePointStyle: true, boxWidth: 8, color: cssVar('--text') } },
-          tooltip: { enabled: true }
+          tooltip: { enabled: true, mode: 'index', intersect: false, axis: 'y' }
         },
         scales: {
           x: { stacked: true, beginAtZero: true, grid: { color: cssVar('--chart-grid') }, ticks: { color: cssVar('--text-muted'), precision: 0 },
