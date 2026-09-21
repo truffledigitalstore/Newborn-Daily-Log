@@ -1247,14 +1247,19 @@
       return s;
     }, 0);
     var feedCaption = (totalOz || totalBreastMin) ? (totalOz + 'oz · ' + totalBreastMin + 'm breast') : 'none yet';
-    var lastMed = meds.length ? meds.slice().sort(function(a,b){ return a.time < b.time ? 1 : -1; })[0].name : null;
+    var medNamesToday = [];
+    meds.forEach(function(m){
+      var key = normalizeMedName(m.name);
+      if(key && medNamesToday.indexOf(key) === -1) medNamesToday.push(key);
+    });
+    var medNamesLabel = medNamesToday.map(titleCaseMed).join(', ');
 
     var grid = document.getElementById('statGrid');
     grid.innerHTML =
       '<div class="stat-card feed"><div class="stat-label">Feeds</div><div class="stat-value">' + feeds.length + '</div><div class="stat-caption">' + feedCaption + '</div></div>' +
       '<div class="stat-card diaper"><div class="stat-label">Diapers</div><div class="stat-value">' + diapers.length + '</div><div class="stat-caption">' + wetCount + ' wet · ' + dirtyCount + ' dirty</div></div>' +
       '<div class="stat-card sleep"><div class="stat-label">Sleep</div><div class="stat-value">' + formatDurationMin(totalSleepMin || 0) + '</div><div class="stat-caption">' + sleeps.length + ' nap' + (sleeps.length === 1 ? '' : 's') + '</div></div>' +
-      '<div class="stat-card medication"><div class="stat-label">Meds</div><div class="stat-value">' + meds.length + '</div><div class="stat-caption">' + (lastMed ? escapeHtml(lastMed) : 'none yet') + '</div></div>';
+      '<div class="stat-card medication"><div class="stat-label">Meds</div><div class="stat-value">' + meds.length + '</div><div class="stat-caption">' + (medNamesLabel ? escapeHtml(medNamesLabel) : 'none yet') + '</div></div>';
   }
 
   function renderHeaderLabels(){
