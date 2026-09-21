@@ -1254,7 +1254,7 @@
       '<div class="stat-card feed"><div class="stat-label">Feeds</div><div class="stat-value">' + feeds.length + '</div><div class="stat-caption">' + feedCaption + '</div></div>' +
       '<div class="stat-card diaper"><div class="stat-label">Diapers</div><div class="stat-value">' + diapers.length + '</div><div class="stat-caption">' + wetCount + ' wet · ' + dirtyCount + ' dirty</div></div>' +
       '<div class="stat-card sleep"><div class="stat-label">Sleep</div><div class="stat-value">' + formatDurationMin(totalSleepMin || 0) + '</div><div class="stat-caption">' + sleeps.length + ' nap' + (sleeps.length === 1 ? '' : 's') + '</div></div>' +
-      '<div class="stat-card medication"><div class="stat-label">Meds</div><div class="stat-value">' + meds.length + '</div><div class="stat-caption">' + (lastMed ? 'last ' + escapeHtml(lastMed) : 'none yet') + '</div></div>';
+      '<div class="stat-card medication"><div class="stat-label">Meds</div><div class="stat-value">' + meds.length + '</div><div class="stat-caption">' + (lastMed ? escapeHtml(lastMed) : 'none yet') + '</div></div>';
   }
 
   function renderHeaderLabels(){
