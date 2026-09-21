@@ -780,10 +780,6 @@
     var years = Math.floor(months / 12);
     return { big: String(years), unit: years === 1 ? 'year old' : 'years old' };
   }
-  function sleepLabel(startIso){
-    var h = new Date(startIso.replace(' ', 'T')).getHours();
-    return (h >= 18 || h < 6) ? 'Night' : 'Nap';
-  }
 
   // ---------------- View switching ----------------
   var currentView = 'today';
@@ -1150,9 +1146,8 @@
       return { icon: ICON_MED, title: title3, sub: entry.notes || '' };
     }
     // sleep
-    var label = sleepLabel(entry.start);
     var dur = entry.end ? formatDurationMin(minutesBetween(entry.start, entry.end)) : 'Still sleeping';
-    return { icon: ICON_SLEEP, title: label + ' · ' + dur, sub: entry.notes || '' };
+    return { icon: ICON_SLEEP, title: 'Nap · ' + dur, sub: entry.notes || '' };
   }
 
   function entryTimeLabel(type, entry){
@@ -1258,7 +1253,7 @@
     grid.innerHTML =
       '<div class="stat-card feed"><div class="stat-label">Feeds</div><div class="stat-value">' + feeds.length + '</div><div class="stat-caption">' + feedCaption + '</div></div>' +
       '<div class="stat-card diaper"><div class="stat-label">Diapers</div><div class="stat-value">' + diapers.length + '</div><div class="stat-caption">' + wetCount + ' wet · ' + dirtyCount + ' dirty</div></div>' +
-      '<div class="stat-card sleep"><div class="stat-label">Sleep</div><div class="stat-value">' + formatDurationMin(totalSleepMin || 0) + '</div><div class="stat-caption">' + sleeps.length + ' session' + (sleeps.length === 1 ? '' : 's') + '</div></div>' +
+      '<div class="stat-card sleep"><div class="stat-label">Sleep</div><div class="stat-value">' + formatDurationMin(totalSleepMin || 0) + '</div><div class="stat-caption">' + sleeps.length + ' nap' + (sleeps.length === 1 ? '' : 's') + '</div></div>' +
       '<div class="stat-card medication"><div class="stat-label">Meds</div><div class="stat-value">' + meds.length + '</div><div class="stat-caption">' + (lastMed ? 'last ' + escapeHtml(lastMed) : 'none yet') + '</div></div>';
   }
 
@@ -1475,7 +1470,7 @@
         tooltip: { enabled: true, callbacks: { label: function(ctx){ return ctx.dataset.label + ': ' + Math.round(ctx.parsed.y); } } }
       },
       scales: {
-        x: { grid: { display: false }, ticks: { color: cssVar('--text-muted') } },
+        x: { grid: { display: false }, ticks: { color: cssVar('--text-muted'), minRotation: 45, maxRotation: 45 } },
         y: { beginAtZero: true, grace: 1, grid: { color: cssVar('--chart-grid') }, ticks: { color: cssVar('--text-muted'), precision: 0 },
              title: { display: !!yTitle, text: yTitle, color: cssVar('--text-muted') } }
       }
@@ -1502,7 +1497,7 @@
         tooltip: { enabled: true }
       },
       scales: {
-        x: { grid: { display: false }, ticks: { color: cssVar('--text-muted') } },
+        x: { grid: { display: false }, ticks: { color: cssVar('--text-muted'), minRotation: 45, maxRotation: 45 } },
         y: { beginAtZero: true, grace: 1, grid: { color: cssVar('--chart-grid') }, ticks: { color: cssVar('--text-muted'), precision: 0 },
              title: { display: !!yTitle, text: yTitle, color: cssVar('--text-muted') } },
         y1: { position: 'right', beginAtZero: true, grace: 1, grid: { drawOnChartArea: false }, ticks: { color: cssVar('--text-muted'), precision: 0 },
@@ -1534,11 +1529,11 @@
       data: { labels: labels, datasets: [
         { type: 'bar', label: 'Sleep (hours)', data: sleepHoursData, order: 2,
           backgroundColor: cssVar('--chart-sleep'), borderRadius: 4, yAxisID: 'y' },
-        { type: 'line', label: 'Sessions', data: sleepSessionsData, order: 1,
+        { type: 'line', label: 'Naps', data: sleepSessionsData, order: 1,
           borderColor: cssVar('--chart-sleep-line'), backgroundColor: cssVar('--chart-sleep-line'),
           tension: 0.3, pointRadius: 4, borderWidth: 2, yAxisID: 'y1' }
       ]},
-      options: comboChartOptions('Hours', 'Sessions')
+      options: comboChartOptions('Hours', 'Naps')
     });
 
     destroyChart('chartDiaper');
@@ -1594,7 +1589,7 @@
       data: { labels: labels, datasets: [
         { label: 'Feeds', data: rangeDays.map(function(d){ return d.feedCount; }), backgroundColor: cssVar('--chart-feed'), stack: 's' },
         { label: 'Diapers', data: rangeDays.map(function(d){ return d.diaperCount; }), backgroundColor: cssVar('--chart-diaper'), stack: 's' },
-        { label: 'Sleep sessions', data: rangeDays.map(function(d){ return d.sleepCount; }), backgroundColor: cssVar('--chart-sleep'), stack: 's' },
+        { label: 'Naps', data: rangeDays.map(function(d){ return d.sleepCount; }), backgroundColor: cssVar('--chart-sleep'), stack: 's' },
         { label: 'Meds', data: rangeDays.map(function(d){ return d.medCount; }), backgroundColor: cssVar('--chart-med'), stack: 's' }
       ]},
       options: {
@@ -1627,13 +1622,13 @@
     });
     document.getElementById('tableFeed').innerHTML = feedHtml + '</tbody>';
 
-    var sleepHtml = '<thead><tr><th>Date</th><th>Sessions</th><th>Total sleep</th></tr></thead><tbody>';
+    var sleepHtml = '<thead><tr><th>Date</th><th>Naps</th><th>Total sleep</th></tr></thead><tbody>';
     rangeDays.forEach(function(d){
       sleepHtml += tableRow([formatAxisLabel(d.date), d.sleepCount, d.sleepMin ? formatDurationMin(d.sleepMin) : '—'], d.sleepCount === 0);
     });
     document.getElementById('tableSleep').innerHTML = sleepHtml + '</tbody>';
 
-    var diaperHtml = '<thead><tr><th>Date</th><th>Wet</th><th>Dirty</th><th>Total</th></tr></thead><tbody>';
+    var diaperHtml = '<thead><tr><th>Date</th><th>Wet</th><th>Dirty</th><th>Changes</th></tr></thead><tbody>';
     rangeDays.forEach(function(d){
       diaperHtml += tableRow([formatAxisLabel(d.date), d.wetCount, d.dirtyCount, d.diaperCount], d.diaperCount === 0);
     });
